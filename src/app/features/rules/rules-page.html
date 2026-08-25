@@ -1,0 +1,269 @@
+<ng-container *transloco="let t">
+  <stampyx-page-header [heading]="t('rules.title')" [eyebrow]="t('rules.hint')">
+    <button type="button" class="stx-pill" (click)="open(null)">
+      <svg
+        viewBox="0 0 24 24"
+        width="15"
+        height="15"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M5 12h14"></path>
+      </svg>
+      {{ t('rules.add') }}
+    </button>
+  </stampyx-page-header>
+
+  <div class="min-h-0 flex-1 overflow-auto p-6">
+    <div class="mx-auto flex max-w-6xl gap-6">
+      <div class="flex w-[396px] shrink-0 flex-col gap-2">
+        @if (items().length === 0) {
+          <stampyx-empty-state [heading]="t('rules.empty')" [body]="t('rules.emptyBody')" />
+        }
+
+        @for (rule of items(); track rule.id; let i = $index) {
+          <button
+            type="button"
+            class="stx-card flex w-full items-center gap-3 px-3.5 py-3 text-left"
+            [style.opacity]="rule.active ? 1 : 0.6"
+            [style.borderColor]="editing()?.id === rule.id ? 'var(--stx-ink)' : 'var(--stx-line)'"
+            (click)="open(rule)"
+          >
+            <span class="flex shrink-0 flex-col gap-0.5" [style.color]="'var(--stx-muted-2)'">
+              <span
+                class="grid h-4 w-4 place-items-center"
+                role="button"
+                tabindex="0"
+                (click)="$event.stopPropagation(); move(rule, -1)"
+                (keydown.enter)="$event.stopPropagation(); move(rule, -1)"
+                [attr.aria-label]="t('rules.moveUp')"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.6"
+                  stroke-linecap="round"
+                >
+                  <path d="m6 15 6-6 6 6"></path>
+                </svg>
+              </span>
+              <span
+                class="grid h-4 w-4 place-items-center"
+                role="button"
+                tabindex="0"
+                (click)="$event.stopPropagation(); move(rule, 1)"
+                (keydown.enter)="$event.stopPropagation(); move(rule, 1)"
+                [attr.aria-label]="t('rules.moveDown')"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.6"
+                  stroke-linecap="round"
+                >
+                  <path d="m6 9 6 6 6-6"></path>
+                </svg>
+              </span>
+            </span>
+
+            <span
+              class="stx-mono grid h-5.5 w-5.5 shrink-0 place-items-center rounded-full px-1.5 text-[11px]"
+              [style.background]="rule.active ? 'var(--stx-ink)' : 'var(--stx-surface-2)'"
+              [style.color]="rule.active ? '#fff' : 'var(--stx-muted-2)'"
+              >{{ i + 1 }}</span
+            >
+
+            <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span class="text-[12.5px] leading-snug">
+                {{ t('rules.if') }}
+                <b [style.color]="'var(--stx-ink-text)'">{{
+                  t('rules.field.' + rule.conditionField)
+                }}</b>
+                {{ t('rules.operator.' + rule.conditionOperator) }}
+                <b class="stx-mono text-[11.5px]">{{ rule.conditionValue }}</b>
+              </span>
+              <span class="truncate text-[12px]" [style.color]="'var(--stx-muted)'">
+                {{ t('rules.action.' + rule.action) }}
+                @if (rule.targetFolder) {
+                  <b [style.color]="'var(--stx-text)'">{{ rule.targetFolder }}</b>
+                }
+              </span>
+            </span>
+
+            <span
+              class="relative h-[17px] w-[30px] shrink-0 rounded-full"
+              role="switch"
+              tabindex="0"
+              [attr.aria-checked]="rule.active"
+              [attr.aria-label]="t('rules.active')"
+              [style.background]="rule.active ? 'var(--stx-ink)' : 'var(--stx-line)'"
+              (click)="$event.stopPropagation(); toggleActive(rule)"
+              (keydown.enter)="$event.stopPropagation(); toggleActive(rule)"
+            >
+              <span
+                class="absolute top-0.5 h-[13px] w-[13px] rounded-full"
+                [style.background]="'var(--stx-surface)'"
+                [style.left.px]="rule.active ? 15 : 2"
+              ></span>
+            </span>
+          </button>
+        }
+      </div>
+
+      @if (draftOpen()) {
+        <section class="stx-card flex min-w-0 flex-1 flex-col gap-4 self-start p-5">
+          <div class="flex items-center justify-between">
+            <h2 class="text-[15px] font-bold">
+              {{ editing() === null ? t('rules.add') : t('rules.editing') }}
+            </h2>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5 text-[15px] leading-loose">
+            <span [style.color]="'var(--stx-muted)'">{{ t('rules.if') }}</span>
+
+            <select
+              class="stx-control rounded-full py-1.5 font-semibold"
+              [value]="draft().conditionField"
+              (change)="patch({ conditionField: $any($event.target).value })"
+              [attr.aria-label]="t('rules.field.sender')"
+            >
+              @for (option of fields; track option) {
+                <option [value]="option">{{ t('rules.field.' + option) }}</option>
+              }
+            </select>
+
+            <select
+              class="stx-control rounded-full py-1.5 font-semibold"
+              [value]="draft().conditionOperator"
+              (change)="patch({ conditionOperator: $any($event.target).value })"
+              [attr.aria-label]="t('rules.operator.contains')"
+            >
+              @for (option of operators; track option) {
+                <option [value]="option">{{ t('rules.operator.' + option) }}</option>
+              }
+            </select>
+
+            <input
+              class="stx-control stx-mono rounded-full py-1.5"
+              [value]="draft().conditionValue"
+              (input)="patch({ conditionValue: $any($event.target).value })"
+              [attr.placeholder]="t('rules.value')"
+              [attr.aria-label]="t('rules.value')"
+              autocomplete="off"
+            />
+
+            <span [style.color]="'var(--stx-muted)'">{{ t('rules.then') }}</span>
+
+            <select
+              class="stx-control rounded-full py-1.5 font-semibold"
+              [value]="draft().action"
+              (change)="setAction($any($event.target).value)"
+              [attr.aria-label]="t('rules.then')"
+            >
+              @for (option of actions; track option) {
+                <option [value]="option">{{ t('rules.action.' + option) }}</option>
+              }
+            </select>
+
+            @if (draft().action === 'move_to') {
+              <select
+                class="stx-control rounded-full py-1.5 font-semibold"
+                [value]="draft().targetFolder ?? ''"
+                (change)="patch({ targetFolder: $any($event.target).value || null })"
+                [attr.aria-label]="t('rules.target')"
+              >
+                <option value="">{{ t('rules.pickFolder') }}</option>
+                @for (row of folderOptions(); track row.path) {
+                  <option [value]="row.path">{{ row.path }}</option>
+                }
+              </select>
+            }
+
+            @if (draft().action === 'forward') {
+              <input
+                class="stx-control stx-mono rounded-full py-1.5"
+                [value]="draft().targetFolder ?? ''"
+                (input)="patch({ targetFolder: $any($event.target).value || null })"
+                [attr.placeholder]="t('rules.forwardTo')"
+                [attr.aria-label]="t('rules.forwardTo')"
+              />
+            }
+          </div>
+
+          <div class="h-px" [style.background]="'var(--stx-line)'"></div>
+
+          @if (preview(); as result) {
+            @if (result.supported) {
+              <div class="flex flex-col gap-2.5">
+                <p class="text-[13px]">
+                  <b [style.color]="'var(--stx-ink-text)'">{{
+                    t('rules.preview.count', { count: result.total })
+                  }}</b>
+                  <span [style.color]="'var(--stx-muted)'"> {{ t('rules.preview.suffix') }}</span>
+                </p>
+
+                @if (result.sample.length > 0) {
+                  <div
+                    class="flex flex-col overflow-hidden rounded-xl border"
+                    [style.borderColor]="'var(--stx-line)'"
+                  >
+                    @for (row of result.sample; track row.id) {
+                      <div
+                        class="flex items-center gap-3 px-3 py-2.5"
+                        [style.background]="'var(--stx-surface-2)'"
+                      >
+                        <span
+                          class="stx-mono truncate text-[11.5px]"
+                          [style.color]="'var(--stx-muted)'"
+                          >{{ row.sender }}</span
+                        >
+                        <span class="flex-1 truncate text-[12px]">{{ row.subject }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="text-[12.5px] leading-relaxed" [style.color]="'var(--stx-muted)'">
+                {{ t('rules.preview.unsupported') }}
+              </p>
+            }
+          }
+
+          <div class="mt-1 flex items-center justify-between gap-4">
+            @if (editing(); as rule) {
+              <button type="button" class="stx-pill stx-pill--danger" (click)="remove(rule)">
+                {{ t('rules.delete') }}
+              </button>
+            } @else {
+              <span></span>
+            }
+
+            <div class="flex items-center gap-3">
+              <button type="button" class="stx-pill stx-pill--quiet" (click)="draftOpen.set(false)">
+                {{ t('common.cancel') }}
+              </button>
+              <button
+                type="button"
+                class="stx-pill"
+                [disabled]="saving() || draft().conditionValue.trim() === ''"
+                (click)="save()"
+              >
+                {{ saving() ? t('common.loading') : t('common.save') }}
+              </button>
+            </div>
+          </div>
+        </section>
+      }
+    </div>
+  </div>
+</ng-container>

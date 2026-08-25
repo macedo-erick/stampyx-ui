@@ -1,0 +1,15 @@
+<stampyx-top-bar />
+
+<div class="flex min-h-0 flex-1">
+  <stampyx-sidebar />
+
+  <main class="flex min-w-0 flex-1 flex-col overflow-hidden">
+    <router-outlet />
+  </main>
+</div>
+
+<p-toast position="bottom-right" />
+
+<!-- ConfirmationService only posts an event; without this rendered, every confirm() was a
+     silent no-op and the delete buttons did nothing. -->
+<p-confirmdialog [style]="{ width: '26rem' }" />

@@ -1,0 +1,28 @@
+import { Component, input } from '@angular/core';
+
+@Component({
+  selector: 'stampyx-page-header',
+  template: `
+    <header
+      class="flex shrink-0 items-center justify-between gap-4 border-b px-6 py-4"
+      [style.borderColor]="'var(--stx-line)'"
+    >
+      <div class="min-w-0">
+        @if (eyebrow(); as text) {
+          <div
+            class="stx-mono text-[11px] uppercase tracking-widest"
+            [style.color]="'var(--stx-muted-2)'"
+          >
+            {{ text }}
+          </div>
+        }
+        <h1 class="truncate text-lg font-semibold">{{ heading() }}</h1>
+      </div>
+      <ng-content />
+    </header>
+  `,
+})
+export class PageHeader {
+  readonly heading = input.required<string>();
+  readonly eyebrow = input<string>();
+}

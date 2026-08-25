@@ -1,0 +1,115 @@
+<ng-container *transloco="let t">
+  <stampyx-page-header [heading]="t('settings.title')" />
+
+  <div class="flex-1 overflow-auto p-6">
+    <div class="mx-auto flex max-w-xl flex-col gap-6">
+      <section class="stx-card p-4">
+        <h2 class="mb-3 text-sm font-semibold">{{ t('settings.appearance') }}</h2>
+
+        <div class="mb-4 flex items-center justify-between gap-4">
+          <label for="theme-toggle" class="text-sm">{{ t('settings.theme') }}</label>
+          <button
+            id="theme-toggle"
+            type="button"
+            class="stx-chip"
+            (click)="theme.toggle()"
+            [attr.aria-pressed]="theme.isDark()"
+          >
+            <i [class]="theme.isDark() ? 'pi pi-moon' : 'pi pi-sun'" aria-hidden="true"></i>
+            {{ theme.isDark() ? t('settings.dark') : t('settings.light') }}
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between gap-4">
+          <span id="locale-label" class="text-sm">{{ t('settings.language') }}</span>
+          <div
+            class="flex gap-1 rounded-full p-1"
+            [style.background]="'var(--stx-surface-2)'"
+            [style.border]="'1px solid var(--stx-line)'"
+          >
+            @for (option of localeOptions; track option.value) {
+              <button
+                type="button"
+                class="rounded-full px-4 py-1.5 text-[12px]"
+                [style.background]="current() === option.value ? 'var(--stx-ink)' : 'transparent'"
+                [style.color]="current() === option.value ? '#fff' : 'var(--stx-muted)'"
+                [style.fontWeight]="current() === option.value ? 600 : 400"
+                [attr.aria-pressed]="current() === option.value"
+                (click)="setLocale(option.value)"
+              >
+                {{ option.label }}
+              </button>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="stx-card p-4">
+        <h2 class="mb-3 text-sm font-semibold">{{ t('settings.account') }}</h2>
+        <p class="text-sm" [style.color]="'var(--stx-muted)'">
+          {{ t('settings.signedInAs') }}
+          <span class="stx-mono" [style.color]="'var(--stx-text)'">{{ auth.email() }}</span>
+        </p>
+      </section>
+
+      @if (targetMailbox(); as mailbox) {
+        <section class="stx-card p-4">
+          <h2 class="mb-1 text-sm font-semibold">{{ t('settings.mailPassword') }}</h2>
+          <p class="mb-3 text-sm" [style.color]="'var(--stx-muted-2)'">
+            {{ isMailboxSession() ? t('settings.mailPasswordOwn') : t('settings.mailPasswordApp') }}
+          </p>
+          <p class="mb-3 text-sm stx-mono">{{ mailbox.address }}</p>
+
+          @if (isMailboxSession()) {
+            <label for="current-password" class="mb-1 block text-sm">
+              {{ t('settings.currentPassword') }}
+            </label>
+            <input
+              class="stx-control"
+              id="current-password"
+              type="password"
+              class="mb-3 w-full"
+              autocomplete="current-password"
+              [value]="currentPassword()"
+              (input)="currentPassword.set($any($event.target).value)"
+            />
+          }
+
+          <label for="new-password" class="mb-1 block text-sm">
+            {{ t('settings.newPassword') }}
+          </label>
+          <input
+            class="stx-control"
+            id="new-password"
+            type="password"
+            class="mb-3 w-full"
+            autocomplete="new-password"
+            [value]="newPassword()"
+            (input)="newPassword.set($any($event.target).value)"
+          />
+
+          @if (feedback(); as key) {
+            <p
+              class="mb-3 text-sm"
+              role="status"
+              [style.color]="saved() ? 'var(--stx-ok, #16a34a)' : 'var(--stx-danger, #dc2626)'"
+            >
+              {{ t(key) }}
+            </p>
+          }
+
+          <div class="flex justify-end">
+            <button
+              type="button"
+              class="stx-pill"
+              [disabled]="saving() || newPassword().length < 12"
+              (click)="savePassword(mailbox.id)"
+            >
+              {{ saving() ? t('common.loading') : t('common.save') }}
+            </button>
+          </div>
+        </section>
+      }
+    </div>
+  </div>
+</ng-container>

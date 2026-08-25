@@ -1,0 +1,235 @@
+@layer theme, base, primeng, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import 'primeicons/primeicons.css';
+
+@plugin 'tailwindcss-primeui';
+@custom-variant dark (&:where(.app-dark, .app-dark *));
+
+/*
+ * The mockup palette is the brand; PrimeNG's Aura variables are the system. Rather than
+ * out-specifying Aura, its own custom properties are redefined here, so every component
+ * keeps computing hover, focus and disabled states from these values.
+ */
+:root {
+  --stx-ink: #2d6f8a;
+  --stx-ink-text: #215b76;
+  --stx-stamp: #a8341f;
+  --stx-amber: #93701f;
+
+  --stx-bg: #f1efe8;
+  --stx-surface: #ffffff;
+  --stx-surface-2: #f6f4ee;
+  --stx-line: #ddd8ca;
+  --stx-text: #242219;
+  --stx-muted: #655f4f;
+  --stx-muted-2: #8a836e;
+
+  --stx-logo-tile: #2d6f8a;
+  --stx-logo-glyph: #f6f4ee;
+
+  --stx-line-strong: #c7c0ad;
+
+  /* Three steps, not one: cards, fields and pills. The single 3px value was what made the
+     panel read as square next to the sign-in screen. */
+  --stx-radius: 14px;
+  --stx-radius-sm: 8px;
+  --stx-radius-pill: 999px;
+
+  --stx-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.app-dark {
+  --stx-ink: #4a9ec2;
+  --stx-ink-text: #7fc1e0;
+  --stx-stamp: #e0654c;
+  --stx-amber: #d9ab52;
+
+  --stx-bg: #14161c;
+  --stx-surface: #1b1e26;
+  --stx-surface-2: #20232c;
+  --stx-line: #2a2e3a;
+  --stx-text: #e8e6e0;
+  --stx-muted: #9296a3;
+  --stx-muted-2: #5c6070;
+
+  --stx-logo-tile: #7fc1e0;
+  --stx-logo-glyph: #14161c;
+
+  --stx-line-strong: #3a3f4e;
+}
+
+:root {
+  --p-primary-color: var(--stx-ink);
+  --p-primary-contrast-color: #ffffff;
+  --p-primary-hover-color: var(--stx-ink-text);
+  --p-content-background: var(--stx-surface);
+  --p-content-border-color: var(--stx-line);
+  /* Most PrimeNG surfaces here are fields and menus, so they take the field radius; the
+     page's own cards use --stx-radius directly. */
+  --p-content-border-radius: var(--stx-radius-sm);
+  --p-border-radius-sm: var(--stx-radius-sm);
+  --p-border-radius-md: var(--stx-radius-sm);
+  --p-border-radius-lg: var(--stx-radius);
+  --p-button-border-radius: var(--stx-radius-pill);
+  --p-inputtext-border-radius: var(--stx-radius-sm);
+  --p-text-color: var(--stx-text);
+  --p-text-muted-color: var(--stx-muted);
+  --p-surface-ground: var(--stx-bg);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--stx-bg);
+  color: var(--stx-text);
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+}
+
+.stx-mono {
+  font-family: var(--stx-mono);
+}
+
+/* The postmark: a rotated dashed stamp, used for status and for the brand mark. */
+.stx-postmark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed currentColor;
+  border-radius: 50%;
+  font-family: var(--stx-mono);
+  font-weight: 600;
+  transform: rotate(-8deg);
+}
+
+.stx-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border: 1px solid var(--stx-line);
+  border-radius: 20px;
+  font-family: var(--stx-mono);
+  font-size: 11px;
+}
+
+.stx-chip .stx-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.stx-chip--ok {
+  color: var(--stx-ink);
+  border-color: color-mix(in srgb, var(--stx-ink) 40%, transparent);
+  background: color-mix(in srgb, var(--stx-ink) 12%, transparent);
+}
+
+.stx-chip--warn {
+  color: var(--stx-amber);
+  border-color: color-mix(in srgb, var(--stx-amber) 40%, transparent);
+  background: color-mix(in srgb, var(--stx-amber) 12%, transparent);
+}
+
+.stx-chip--bad {
+  color: var(--stx-stamp);
+  border-color: color-mix(in srgb, var(--stx-stamp) 40%, transparent);
+  background: color-mix(in srgb, var(--stx-stamp) 12%, transparent);
+}
+
+/* iOS zooms a focused field under 16px; only applies where the pointer is coarse. */
+@media (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Shared shapes for the panel, so a screen does not have to restate them. */
+.stx-card {
+  background: var(--stx-surface);
+  border: 1px solid var(--stx-line);
+  border-radius: var(--stx-radius);
+}
+
+.stx-control {
+  padding: 10px 12px;
+  border: 1px solid var(--stx-line-strong);
+  border-radius: var(--stx-radius-sm);
+  background: var(--stx-surface-2);
+  color: var(--stx-text);
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.stx-control:focus,
+.stx-control:focus-within {
+  border-color: var(--stx-ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--stx-ink) 22%, transparent);
+}
+
+.stx-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border: 1px solid transparent;
+  border-radius: var(--stx-radius-pill);
+  background: var(--stx-ink);
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.stx-pill:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.stx-pill:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.stx-pill--quiet {
+  background: var(--stx-surface-2);
+  border-color: var(--stx-line);
+  color: var(--stx-text);
+}
+
+.stx-pill--danger {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--stx-stamp) 45%, transparent);
+  color: var(--stx-stamp);
+}
+
+.stx-eyebrow {
+  font-family: var(--stx-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--stx-muted-2);
+}

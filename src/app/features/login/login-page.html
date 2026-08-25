@@ -1,0 +1,189 @@
+<ng-container *transloco="let t">
+  <div class="stx-page">
+    <header class="stx-top">
+      <span class="stx-brand">
+        <span class="stx-brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect
+              x="2.5"
+              y="5"
+              width="19"
+              height="14"
+              rx="2.5"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+            <path
+              d="M3.6 6.6 12 13l8.4-6.4"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+        <span class="stx-brand-name">Stampyx</span>
+      </span>
+
+      <button
+        type="button"
+        class="stx-icon-btn"
+        (click)="theme.toggle()"
+        [attr.aria-label]="t(theme.isDark() ? 'theme.toLight' : 'theme.toDark')"
+        [attr.aria-pressed]="theme.isDark()"
+      >
+        @if (theme.isDark()) {
+          <svg
+            class="stx-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path>
+          </svg>
+        } @else {
+          <svg
+            class="stx-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="4"></circle>
+            <path
+              d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+            ></path>
+          </svg>
+        }
+      </button>
+    </header>
+
+    <main class="stx-main">
+      <div class="stx-card">
+        <div class="stx-card-copy">
+          <h1 class="stx-title">{{ t('login.title') }}</h1>
+          <p class="stx-subtitle">{{ t('login.subtitle') }}</p>
+        </div>
+
+        <div class="stx-card-form">
+          @if (failed(); as key) {
+            <div class="stx-alert stx-alert--error" role="alert">{{ t(key) }}</div>
+          }
+
+          <form (ngSubmit)="submit()">
+            @if (step() === 1) {
+              <section class="stx-step">
+                <label class="stx-field" [class.stx-field--error]="failed() !== null">
+                  <span class="stx-label">{{ t('login.email') }}</span>
+                  <span class="stx-affix">
+                    <input
+                      class="stx-input"
+                      name="email"
+                      type="email"
+                      inputmode="email"
+                      spellcheck="false"
+                      autocomplete="username"
+                      #focusTarget
+                      placeholder="alfie.hitchcock@stampyx.com"
+                      [ngModel]="email()"
+                      (ngModelChange)="email.set($event)"
+                    />
+                  </span>
+                </label>
+                <span class="stx-hint">{{ t('login.emailHint') }}</span>
+
+                <div class="stx-actions">
+                  <button class="stx-link" type="button" (click)="signInWithKeycloak()">
+                    {{ t('login.ownerAction') }}
+                  </button>
+                  <button
+                    class="stx-btn"
+                    type="button"
+                    [disabled]="!canContinue()"
+                    (click)="next()"
+                  >
+                    {{ t('login.continue') }}
+                  </button>
+                </div>
+              </section>
+            } @else {
+              <section class="stx-step">
+                <div class="stx-identity">
+                  <span class="stx-identity-value">{{ email() }}</span>
+                  <button class="stx-link-btn" type="button" (click)="back()">
+                    {{ t('login.change') }}
+                  </button>
+                </div>
+
+                <label class="stx-field" [class.stx-field--error]="failed() !== null">
+                  <span class="stx-label">{{ t('login.password') }}</span>
+                  <span class="stx-affix">
+                    <input
+                      class="stx-input"
+                      name="password"
+                      [type]="revealed() ? 'text' : 'password'"
+                      autocomplete="current-password"
+                      #focusTarget
+                      [ngModel]="password()"
+                      (ngModelChange)="password.set($event)"
+                    />
+                    <button
+                      class="stx-reveal"
+                      type="button"
+                      [class.is-on]="revealed()"
+                      (click)="revealed.set(!revealed())"
+                      [attr.aria-label]="
+                        t(revealed() ? 'login.hidePassword' : 'login.showPassword')
+                      "
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"
+                        ></path>
+                        <circle cx="12" cy="12" r="2.6"></circle>
+                      </svg>
+                    </button>
+                  </span>
+                </label>
+
+                <div class="stx-row">
+                  <span class="stx-hint">{{ t('login.forgotHint') }}</span>
+                </div>
+
+                <div class="stx-actions">
+                  <button class="stx-link-btn" type="button" (click)="back()">
+                    {{ t('login.back') }}
+                  </button>
+                  <button class="stx-btn" type="submit" [disabled]="busy()">
+                    {{ busy() ? t('common.loading') : t('login.submit') }}
+                  </button>
+                </div>
+              </section>
+            }
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <footer class="stx-foot">
+      <span>Stampyx</span>
+      <span class="stx-foot-dot" aria-hidden="true">&middot;</span>
+      <span>{{ t('login.footer') }}</span>
+    </footer>
+  </div>
+</ng-container>

@@ -1,0 +1,333 @@
+<ng-container *transloco="let t">
+  <div class="head">
+    <span class="head-title">{{ subject() || t('compose.title') }}</span>
+    <div class="head-actions">
+      <button
+        type="button"
+        class="icon-button"
+        (click)="minimized.set(!minimized())"
+        [attr.aria-label]="t(minimized() ? 'compose.expand' : 'compose.minimize')"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+        >
+          <path [attr.d]="minimized() ? 'M12 5v14M5 12h14' : 'M5 12h14'"></path>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="icon-button"
+        (click)="close()"
+        [attr.aria-label]="t('common.cancel')"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+        >
+          <path d="M18 6 6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="row">
+    <span class="row-label">{{ t('compose.from') }}</span>
+    <span class="sender">
+      <span class="chip-avatar">{{ initials(from()) }}</span>
+      {{ from() }}
+    </span>
+  </div>
+
+  <div class="row">
+    <span class="row-label">{{ t('compose.to') }}</span>
+    <div class="chips">
+      @for (address of to(); track address) {
+        <span class="chip">
+          <span class="chip-avatar">{{ initials(address) }}</span>
+          {{ address }}
+          <button
+            type="button"
+            class="chip-remove"
+            (click)="drop('to', address)"
+            [attr.aria-label]="t('common.delete')"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="12"
+              height="12"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+            >
+              <path d="M18 6 6 18M6 6l12 12"></path>
+            </svg>
+          </button>
+        </span>
+      }
+      <input
+        class="chip-input"
+        type="email"
+        autocomplete="off"
+        [attr.aria-label]="t('compose.to')"
+        (keydown)="onKey('to', $event)"
+        (blur)="commit('to', $event)"
+      />
+    </div>
+    <div class="row-extra">
+      @if (!showCc()) {
+        <button type="button" class="link-button" (click)="showCc.set(true)">
+          {{ t('compose.cc') }}
+        </button>
+      }
+      @if (!showBcc()) {
+        <button type="button" class="link-button" (click)="showBcc.set(true)">
+          {{ t('compose.bcc') }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (showCc()) {
+    <div class="row">
+      <span class="row-label">{{ t('compose.cc') }}</span>
+      <div class="chips">
+        @for (address of cc(); track address) {
+          <span class="chip">
+            <span class="chip-avatar">{{ initials(address) }}</span>
+            {{ address }}
+            <button
+              type="button"
+              class="chip-remove"
+              (click)="drop('cc', address)"
+              [attr.aria-label]="t('common.delete')"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="12"
+                height="12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linecap="round"
+              >
+                <path d="M18 6 6 18M6 6l12 12"></path>
+              </svg>
+            </button>
+          </span>
+        }
+        <input
+          class="chip-input"
+          type="email"
+          autocomplete="off"
+          [attr.aria-label]="t('compose.cc')"
+          (keydown)="onKey('cc', $event)"
+          (blur)="commit('cc', $event)"
+        />
+      </div>
+    </div>
+  }
+
+  @if (showBcc()) {
+    <div class="row">
+      <span class="row-label">{{ t('compose.bcc') }}</span>
+      <div class="chips">
+        @for (address of bcc(); track address) {
+          <span class="chip">
+            <span class="chip-avatar">{{ initials(address) }}</span>
+            {{ address }}
+            <button
+              type="button"
+              class="chip-remove"
+              (click)="drop('bcc', address)"
+              [attr.aria-label]="t('common.delete')"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="12"
+                height="12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linecap="round"
+              >
+                <path d="M18 6 6 18M6 6l12 12"></path>
+              </svg>
+            </button>
+          </span>
+        }
+        <input
+          class="chip-input"
+          type="email"
+          autocomplete="off"
+          [attr.aria-label]="t('compose.bcc')"
+          (keydown)="onKey('bcc', $event)"
+          (blur)="commit('bcc', $event)"
+        />
+      </div>
+    </div>
+  }
+
+  <div class="row">
+    <span class="row-label">{{ t('compose.subject') }}</span>
+    <input
+      class="subject"
+      type="text"
+      autocomplete="off"
+      [attr.aria-label]="t('compose.subject')"
+      [value]="subject()"
+      (input)="subject.set($any($event.target).value)"
+    />
+  </div>
+
+  <div class="toolbar">
+    <button type="button" (click)="format('bold')" [attr.aria-label]="t('compose.bold')">
+      <svg
+        viewBox="0 0 24 24"
+        width="14"
+        height="14"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M6 4h8a4 4 0 0 1 0 8H6zM6 12h9a4 4 0 0 1 0 8H6z"></path>
+      </svg>
+    </button>
+    <button type="button" (click)="format('italic')" [attr.aria-label]="t('compose.italic')">
+      <svg
+        viewBox="0 0 24 24"
+        width="14"
+        height="14"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <path d="M19 4h-9M14 20H5M15 4 9 20"></path>
+      </svg>
+    </button>
+    <button type="button" (click)="addLink()" [attr.aria-label]="t('compose.link')">
+      <svg
+        viewBox="0 0 24 24"
+        width="14"
+        height="14"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div
+    #editor
+    class="body"
+    contenteditable="true"
+    role="textbox"
+    aria-multiline="true"
+    [attr.aria-label]="t('compose.body')"
+    [attr.data-placeholder]="t('compose.body')"
+  ></div>
+
+  <div class="attachments">
+    <div class="attachment-grid">
+      @for (row of attachments(); track row.id) {
+        <div class="attachment">
+          <span class="attachment-kind">{{ kindOf(row) }}</span>
+          <span class="attachment-meta">
+            <span class="attachment-name">{{ row.fileName }}</span>
+            <span class="attachment-size">{{ humanSize(row.sizeBytes) }}</span>
+          </span>
+          <button
+            type="button"
+            class="chip-remove"
+            (click)="discardAttachment(row)"
+            [attr.aria-label]="t('common.delete')"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="13"
+              height="13"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+            >
+              <path d="M18 6 6 18M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      }
+      <button type="button" class="dropzone" (click)="choose()">
+        <svg
+          viewBox="0 0 24 24"
+          width="15"
+          height="15"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.9"
+          stroke-linecap="round"
+        >
+          <path d="M12 5v14M5 12h14"></path>
+        </svg>
+        {{ uploading() ? t('compose.uploading') : t('compose.dropHint') }}
+      </button>
+    </div>
+
+    @if (attachments().length > 0) {
+      <div class="quota">
+        <div class="quota-track">
+          <div
+            class="quota-fill"
+            [class.is-over]="overQuota()"
+            [style.width.%]="quotaPercent()"
+          ></div>
+        </div>
+        <span class="quota-text">{{ humanSize(usedBytes()) }} / 25 MB</span>
+      </div>
+    }
+  </div>
+
+  <input #picker type="file" multiple hidden (change)="onPicked($event)" />
+
+  <div class="foot">
+    <div class="flex items-center gap-4">
+      <button type="button" class="discard" (click)="saveDraft()">
+        {{ savingDraft() ? t('common.loading') : t('compose.saveDraft') }}
+      </button>
+      <button type="button" class="discard" (click)="close()">{{ t('compose.discard') }}</button>
+    </div>
+    <button type="button" class="send" [disabled]="!canSend()" (click)="send()">
+      {{ sending() ? t('common.loading') : t('compose.send') }}
+      <svg
+        viewBox="0 0 24 24"
+        width="14"
+        height="14"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
+      </svg>
+    </button>
+  </div>
+</ng-container>

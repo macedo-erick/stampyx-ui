@@ -1,0 +1,113 @@
+<ng-container *transloco="let t">
+  <stampyx-page-header
+    [heading]="t('domains.title')"
+    [eyebrow]="t('domains.count', { count: items().length })"
+  >
+    <button type="button" class="stx-pill" (click)="open()">
+      <svg
+        viewBox="0 0 24 24"
+        width="15"
+        height="15"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M5 12h14"></path>
+      </svg>
+      {{ t('domains.add') }}
+    </button>
+  </stampyx-page-header>
+
+  <div class="min-h-0 flex-1 overflow-auto p-6">
+    <div class="mx-auto flex max-w-4xl flex-col gap-4">
+      @if (dialogOpen()) {
+        <section class="stx-card flex flex-col gap-3.5 p-5">
+          <h2 class="text-[15px] font-bold">{{ t('domains.add') }}</h2>
+
+          <label class="flex flex-col gap-1.5">
+            <span class="text-[11.5px] font-semibold" [style.color]="'var(--stx-muted)'">{{
+              t('domains.name')
+            }}</span>
+            <input
+              class="stx-control stx-mono"
+              [value]="newName()"
+              (input)="newName.set($any($event.target).value)"
+              (keydown.enter)="save()"
+              placeholder="empresa.com"
+              autocomplete="off"
+            />
+          </label>
+
+          <p class="text-[11.5px] leading-relaxed" [style.color]="'var(--stx-muted-2)'">
+            {{ t('domains.addHint') }}
+          </p>
+
+          <div class="flex justify-end gap-3">
+            <button type="button" class="stx-pill stx-pill--quiet" (click)="dialogOpen.set(false)">
+              {{ t('common.cancel') }}
+            </button>
+            <button
+              type="button"
+              class="stx-pill"
+              [disabled]="saving() || newName().trim() === ''"
+              (click)="save()"
+            >
+              {{ saving() ? t('common.loading') : t('common.save') }}
+            </button>
+          </div>
+        </section>
+      }
+
+      @if (loading()) {
+        <p class="text-sm" [style.color]="'var(--stx-muted)'">{{ t('common.loading') }}</p>
+      } @else if (items().length === 0) {
+        <stampyx-empty-state [heading]="t('domains.empty')" [body]="t('domains.emptyBody')" />
+      } @else {
+        <ul class="flex flex-col gap-2.5">
+          @for (domain of items(); track domain.id) {
+            <li class="stx-card flex flex-wrap items-center gap-3 p-4">
+              <a
+                [routerLink]="['/domains', domain.id]"
+                class="stx-mono min-w-0 flex-1 truncate text-[14px] font-semibold"
+              >
+                {{ domain.name }}
+              </a>
+
+              <span class="stx-chip" [class]="domain.verified ? 'stx-chip--ok' : 'stx-chip--warn'">
+                <span class="stx-dot" aria-hidden="true"></span>
+                {{ domain.verified ? t('domains.verified') : t('domains.unverified') }}
+              </span>
+
+              @if (!domain.verified) {
+                <button type="button" class="stx-pill stx-pill--quiet" (click)="verify(domain)">
+                  {{ t('domains.verify') }}
+                </button>
+              }
+
+              <a
+                [routerLink]="['/domains', domain.id]"
+                class="grid h-8 w-8 place-items-center rounded-full"
+                [style.color]="'var(--stx-muted)'"
+                [attr.aria-label]="t('domains.openDetail', { name: domain.name })"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
+                  <path d="m9 18 6-6-6-6"></path>
+                </svg>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+</ng-container>

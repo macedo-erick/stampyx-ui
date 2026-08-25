@@ -1,0 +1,130 @@
+<ng-container *transloco="let t">
+  <div class="stx-page">
+    <header class="stx-top">
+      <span class="stx-brand">
+        <span class="stx-brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect
+              x="2.5"
+              y="5"
+              width="19"
+              height="14"
+              rx="2.5"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+            <path
+              d="M3.6 6.6 12 13l8.4-6.4"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+        <span class="stx-brand-name">Stampyx</span>
+      </span>
+
+      <button
+        type="button"
+        class="stx-icon-btn"
+        (click)="theme.toggle()"
+        [attr.aria-label]="t(theme.isDark() ? 'theme.toLight' : 'theme.toDark')"
+        [attr.aria-pressed]="theme.isDark()"
+      >
+        <svg
+          class="stx-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          @if (theme.isDark()) {
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path>
+          } @else {
+            <circle cx="12" cy="12" r="4"></circle>
+            <path
+              d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+            ></path>
+          }
+        </svg>
+      </button>
+    </header>
+
+    <main class="stx-main">
+      <div class="stx-card">
+        <div class="stx-card-copy">
+          <h1 class="stx-title">{{ t('onboarding.title') }}</h1>
+          <p class="stx-subtitle">{{ t('onboarding.subtitle') }}</p>
+        </div>
+
+        <div class="stx-card-form">
+          <label class="stx-field">
+            <span class="stx-label">{{ t('onboarding.address') }}</span>
+            <span class="stx-affix">
+              <input
+                class="stx-input"
+                [value]="localPart()"
+                (input)="localPart.set($any($event.target).value); available.set(null)"
+                (blur)="check()"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="seu.nome"
+                [attr.aria-label]="t('onboarding.address')"
+              />
+              @if (domains().length > 1) {
+                <select
+                  class="stx-select"
+                  [value]="domainId() ?? ''"
+                  (change)="domainId.set($any($event.target).value); check()"
+                  [attr.aria-label]="t('onboarding.domain')"
+                >
+                  @for (row of domains(); track row.id) {
+                    <option [value]="row.id">&#64;{{ row.name }}</option>
+                  }
+                </select>
+              } @else {
+                <span class="stx-suffix">&#64;{{ domainName() }}</span>
+              }
+            </span>
+
+            @if (checking()) {
+              <span class="stx-hint">{{ t('onboarding.checking') }}</span>
+            } @else if (available() === true) {
+              <span class="stx-hint stx-help--ok">{{ t('onboarding.available') }}</span>
+            } @else if (available() === false) {
+              <span class="stx-hint stx-help--bad">{{ t('onboarding.taken') }}</span>
+            } @else {
+              <span class="stx-hint">{{ t('onboarding.hint') }}</span>
+            }
+          </label>
+
+          <div class="stx-alert">{{ t('onboarding.mailPasswordNote') }}</div>
+
+          <div class="stx-actions">
+            <button type="button" class="stx-link-btn" (click)="skip()">
+              {{ t('onboarding.later') }}
+            </button>
+            <button
+              type="button"
+              class="stx-btn"
+              [disabled]="available() !== true || saving()"
+              (click)="claim()"
+            >
+              {{ saving() ? t('common.loading') : t('onboarding.submit') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="stx-foot">
+      <span>Stampyx</span>
+      <span class="stx-foot-dot" aria-hidden="true">&middot;</span>
+      <span>{{ t('login.footer') }}</span>
+    </footer>
+  </div>
+</ng-container>

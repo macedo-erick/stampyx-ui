@@ -1,0 +1,428 @@
+/* Same shapes as the sign-in screen: picking an address is the last step of signing up, so
+   it should not look like a different product. */
+:host {
+  --stx-bg: #f1efe8;
+  --stx-surface: #ffffff;
+  --stx-surface-2: #f6f4ee;
+  --stx-line: #ddd8ca;
+  --stx-line-strong: #c7c0ad;
+  --stx-text: #242219;
+  --stx-muted: #655f4f;
+  --stx-ink: #215b76;
+  --stx-ink-contrast: #ffffff;
+  --stx-stamp: #a8341f;
+  --stx-focus: #215b76;
+  --stx-radius: 14px;
+  --stx-radius-sm: 8px;
+  --stx-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --stx-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --stx-logo-tile: var(--stx-ink);
+  --stx-logo-glyph: var(--stx-ink-contrast);
+
+  display: block;
+  min-height: 100%;
+  background: var(--stx-bg);
+  color: var(--stx-text);
+  font-family: var(--stx-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:host-context(.app-dark) {
+  --stx-bg: #101218;
+  --stx-surface: #1b1e26;
+  --stx-surface-2: #20232c;
+  --stx-line: #2a2e3a;
+  --stx-line-strong: #3a3f4e;
+  --stx-text: #e8e6e0;
+  --stx-muted: #9296a3;
+  --stx-ink: #6cc0e4;
+  --stx-ink-contrast: #0d1319;
+  --stx-stamp: #ef8871;
+  --stx-focus: #6cc0e4;
+}
+
+.stx-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: 20px clamp(16px, 4vw, 32px) 24px;
+  box-sizing: border-box;
+}
+
+.stx-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.stx-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.stx-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--stx-text);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.stx-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--stx-ink);
+  color: var(--stx-ink-contrast);
+}
+
+.stx-brand-mark svg {
+  width: 19px;
+  height: 19px;
+}
+
+.stx-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--stx-line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--stx-muted);
+  cursor: pointer;
+}
+
+.stx-icon-btn:hover {
+  color: var(--stx-text);
+  border-color: var(--stx-line-strong);
+}
+
+.stx-icon {
+  width: 17px;
+  height: 17px;
+}
+
+.stx-main {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 40px 0;
+}
+
+.stx-card {
+  width: min(100%, 840px);
+  min-height: 300px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(24px, 5vw, 56px);
+  padding: clamp(24px, 4vw, 44px);
+  box-sizing: border-box;
+  background: var(--stx-surface);
+  border: 1px solid var(--stx-line);
+  border-radius: var(--stx-radius);
+}
+
+.stx-card-copy {
+  min-width: 0;
+}
+
+.stx-card-form {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.stx-title {
+  margin: 0;
+  font-size: clamp(1.4rem, 2.6vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.stx-subtitle {
+  margin: 10px 0 0;
+  color: var(--stx-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.stx-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  padding: 7px 12px;
+  border: 1px solid var(--stx-line);
+  border-radius: 999px;
+  background: var(--stx-surface-2);
+  width: fit-content;
+  max-width: 100%;
+}
+
+.stx-identity-value {
+  font-family: var(--stx-mono);
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+.stx-step {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.stx-field {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.stx-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--stx-text);
+}
+
+.stx-affix {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--stx-line-strong);
+  border-radius: var(--stx-radius-sm);
+  background: var(--stx-surface-2);
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.stx-affix:focus-within {
+  border-color: var(--stx-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--stx-focus) 22%, transparent);
+}
+
+.stx-field--error .stx-affix {
+  border-color: var(--stx-stamp);
+}
+
+.stx-input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 0;
+  border: 0;
+  background: transparent;
+  color: var(--stx-text);
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+/* Verbatim from the theme. Without the !important the `:focus-visible` rule further down
+   wins on equal specificity and paints a second ring inside the affix's own focus border. */
+.stx-input,
+.stx-affix input {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.stx-input::placeholder {
+  color: var(--stx-muted);
+  opacity: 0.75;
+}
+
+.stx-reveal {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--stx-muted);
+  cursor: pointer;
+}
+
+.stx-reveal svg {
+  width: 17px;
+  height: 17px;
+}
+
+.stx-reveal:hover,
+.stx-reveal.is-on {
+  color: var(--stx-ink);
+}
+
+.stx-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--stx-muted);
+}
+
+.stx-error {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--stx-stamp);
+}
+
+.stx-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.stx-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+  margin-top: auto;
+  padding-top: 28px;
+}
+
+.stx-btn {
+  padding: 10px 20px;
+  border: 1px solid var(--stx-ink);
+  border-radius: 999px;
+  background: var(--stx-ink);
+  color: var(--stx-ink-contrast);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 120ms ease;
+}
+
+.stx-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.stx-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.stx-link,
+.stx-link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--stx-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.stx-link:hover,
+.stx-link-btn:hover {
+  color: var(--stx-text);
+  text-decoration: underline;
+}
+
+.stx-link--quiet {
+  font-size: 0.85rem;
+}
+
+:where(.stx-page) :focus-visible {
+  outline: 2px solid var(--stx-focus);
+  outline-offset: 2px;
+}
+
+.stx-alert {
+  margin-bottom: 18px;
+  padding: 10px 14px;
+  border: 1px solid var(--stx-line);
+  border-left-width: 3px;
+  border-radius: var(--stx-radius-sm);
+  background: var(--stx-surface-2);
+  font-size: 0.87rem;
+  line-height: 1.5;
+}
+
+.stx-alert--error {
+  border-left-color: var(--stx-stamp);
+}
+
+.stx-foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--stx-muted);
+}
+
+.stx-foot-dot {
+  opacity: 0.6;
+}
+
+@media (max-width: 720px) {
+  .stx-card {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .stx-actions {
+    padding-top: 22px;
+  }
+}
+
+.stx-suffix {
+  flex: none;
+  font-family: var(--stx-mono);
+  font-size: 0.85rem;
+  color: var(--stx-muted);
+  white-space: nowrap;
+}
+
+.stx-select {
+  flex: none;
+  padding: 12px 0;
+  border: 0;
+  background: transparent;
+  color: var(--stx-text);
+  font: inherit;
+  font-family: var(--stx-mono);
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.stx-help--ok {
+  color: #6fae7a;
+}
+
+.stx-help--bad {
+  color: var(--stx-stamp);
+}

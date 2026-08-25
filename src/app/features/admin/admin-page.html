@@ -1,0 +1,130 @@
+<ng-container *transloco="let t">
+  <stampyx-page-header [heading]="t('admin.title')" [eyebrow]="t('admin.eyebrow')">
+    <button type="button" class="stx-pill stx-pill--quiet" (click)="reload()">
+      {{ t('common.reload') }}
+    </button>
+  </stampyx-page-header>
+
+  <div class="flex-1 overflow-auto p-6">
+    <div class="mx-auto flex max-w-5xl flex-col gap-6">
+      <section class="stx-card p-4">
+        <h2 class="mb-3 text-sm font-semibold">{{ t('admin.accounts') }}</h2>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left" [style.color]="'var(--stx-muted-2)'">
+                <th class="py-2 pr-3 font-medium">{{ t('admin.email') }}</th>
+                <th class="py-2 pr-3 font-medium">{{ t('admin.status') }}</th>
+                <th class="py-2 pr-3 font-medium">{{ t('admin.domains') }}</th>
+                <th class="py-2 pr-3 font-medium">{{ t('admin.mailboxes') }}</th>
+                <th class="py-2 font-medium"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of accounts(); track row.id) {
+                <tr class="border-t" [style.borderColor]="'var(--stx-line)'">
+                  <td class="py-2 pr-3">{{ row.email }}</td>
+                  <td class="py-2 pr-3">
+                    <span class="stx-chip">{{ t('admin.statuses.' + row.status) }}</span>
+                  </td>
+                  <td class="py-2 pr-3 stx-mono">{{ row.domainCount }}</td>
+                  <td class="py-2 pr-3 stx-mono">{{ row.mailboxCount }}</td>
+                  <td class="py-2">
+                    <div class="flex justify-end gap-2">
+                      @if (row.status === 'active') {
+                        <button
+                          type="button"
+                          class="stx-pill stx-pill--quiet"
+                          [disabled]="busy()"
+                          (click)="setStatus(row, 'suspended')"
+                        >
+                          {{ t('admin.suspend') }}
+                        </button>
+                      } @else {
+                        <button
+                          type="button"
+                          class="stx-pill stx-pill--quiet"
+                          [disabled]="busy()"
+                          (click)="setStatus(row, 'active')"
+                        >
+                          {{ t('admin.activate') }}
+                        </button>
+                      }
+                      <button
+                        type="button"
+                        class="stx-pill stx-pill--danger"
+                        [disabled]="busy()"
+                        (click)="removeAccount(row)"
+                      >
+                        {{ t('common.delete') }}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="py-4 text-center" [style.color]="'var(--stx-muted-2)'">
+                    {{ t('common.none') }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="stx-card p-4">
+        <h2 class="mb-3 text-sm font-semibold">{{ t('admin.allMailboxes') }}</h2>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left" [style.color]="'var(--stx-muted-2)'">
+                <th class="py-2 pr-3 font-medium">{{ t('admin.address') }}</th>
+                <th class="py-2 pr-3 font-medium">{{ t('admin.owner') }}</th>
+                <th class="py-2 pr-3 font-medium">{{ t('admin.kind') }}</th>
+                <th class="py-2 font-medium"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of mailboxes(); track row.id) {
+                <tr class="border-t" [style.borderColor]="'var(--stx-line)'">
+                  <td class="py-2 pr-3 stx-mono">{{ row.address }}</td>
+                  <td class="py-2 pr-3">{{ row.accountEmail }}</td>
+                  <td class="py-2 pr-3">
+                    <span class="stx-chip">{{ t('admin.kinds.' + row.domainKind) }}</span>
+                  </td>
+                  <td class="py-2">
+                    <div class="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        class="stx-pill stx-pill--quiet"
+                        (click)="resetPassword(row)"
+                      >
+                        {{ t('admin.resetPassword') }}
+                      </button>
+                      <button
+                        type="button"
+                        class="stx-pill stx-pill--danger"
+                        (click)="removeMailbox(row)"
+                      >
+                        {{ t('common.delete') }}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" class="py-4 text-center" [style.color]="'var(--stx-muted-2)'">
+                    {{ t('common.none') }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</ng-container>
