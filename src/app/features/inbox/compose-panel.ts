@@ -16,6 +16,24 @@ import { AttachmentService } from '../../core/api/attachment.service';
 import { MessageService } from '../../core/api/message.service';
 import type { DraftAttachment, Mailbox } from '../../shared/models';
 
+// What the toolbar can hand to execCommand. Deprecated on paper, but it is still the only
+// contenteditable formatting API every browser implements, and a real editor engine is a
+// dependency this panel does not need.
+type InlineCommand =
+  | 'bold'
+  | 'italic'
+  | 'underline'
+  | 'strikeThrough'
+  | 'insertUnorderedList'
+  | 'insertOrderedList'
+  | 'justifyLeft'
+  | 'justifyCenter'
+  | 'justifyRight'
+  | 'outdent'
+  | 'indent';
+
+type BlockTag = 'p' | 'h1' | 'h2' | 'h3' | 'blockquote' | 'pre';
+
 // Reply and Forward differ only in what they seed: a reply knows the recipient and threads
 // onto the original, a forward starts with an empty To and carries the text along.
 export interface ComposeSeed {
@@ -72,7 +90,11 @@ export class ComposePanel {
   protected readonly dragging = signal(false);
   private readonly prefilled = signal(false);
 
-  protected readonly from = computed(() => this.senders()[0]?.address ?? '');
+  // The send goes out as mailboxId, so the header has to name that mailbox. Taking the first
+  // sender on the account showed one address while the message left from another.
+  protected readonly from = computed(
+    () => this.senders().find((row) => row.id === this.mailboxId())?.address ?? '',
+  );
 
   private readonly inReplyTo = signal<string | null>(null);
 
@@ -151,9 +173,16 @@ export class ComposePanel {
     return address.slice(0, 2).toUpperCase();
   }
 
-  protected format(command: 'bold' | 'italic'): void {
+  protected format(command: InlineCommand): void {
     this.editor()?.nativeElement.focus();
     document.execCommand(command);
+  }
+
+  // formatBlock wants the tag in angle brackets: the bare name works in Chrome and is
+  // ignored by Firefox, which is how headings silently did nothing there.
+  protected block(tag: BlockTag): void {
+    this.editor()?.nativeElement.focus();
+    document.execCommand('formatBlock', false, `<${tag}>`);
   }
 
   protected addLink(): void {
@@ -164,7 +193,16 @@ export class ComposePanel {
     }
 
     this.editor()?.nativeElement.focus();
-    document.execCommand('createLink', false, href.trim());
+    // Bare hostnames become relative URLs, which resolve against the panel rather than the
+    // site the writer meant.
+    document.execCommand('createLink', false, withScheme(href.trim()));
+  }
+
+  // execCommand leaves the block wrapper behind, so a cleared heading stays a heading.
+  protected clearFormatting(): void {
+    this.editor()?.nativeElement.focus();
+    document.execCommand('removeFormat');
+    document.execCommand('formatBlock', false, '<p>');
   }
 
   protected choose(): void {
@@ -337,4 +375,8 @@ export class ComposePanel {
   private bucket(list: 'to' | 'cc' | 'bcc') {
     return list === 'to' ? this.to : list === 'cc' ? this.cc : this.bcc;
   }
+}
+
+function withScheme(href: string): string {
+  return /^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//') ? href : `https://${href}`;
 }

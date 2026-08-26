@@ -77,11 +77,15 @@ export class RealtimeService {
   }
 }
 
+// The push carries the envelope the notify pipe could read off the message; a delivered
+// mail has no recipient column and its thread root is only known once the row is listed.
 export function toSummary(event: MailReceived): MessageSummary {
   return {
     id: event.id,
     messageId: event.messageId,
     sender: event.sender,
+    recipient: null,
+    threadId: null,
     subject: event.subject,
     folder: event.folder,
     receivedAt: event.receivedAt,

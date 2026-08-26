@@ -66,7 +66,16 @@
     "emptyBody": "Nothing in this folder yet. New mail shows up here.",
     "archive": "Archive",
     "forward": "Forward",
-    "download": "Download {{name}}"
+    "download": "Download {{name}}",
+    "to": "To",
+    "cc": "Cc",
+    "date": "Date",
+    "folder": "Folder",
+    "spamScore": "Spam score",
+    "messageId": "Message-ID",
+    "details": "Message details",
+    "toLine": "to {{names}}",
+    "noRecipients": "no visible recipient"
   },
   "compose": {
     "title": "New message",
@@ -90,7 +99,20 @@
     "linkPrompt": "Link address",
     "attachmentFailed": "Could not attach {{name}}",
     "saveDraft": "Save draft",
-    "draftSaved": "Draft saved to Drafts"
+    "draftSaved": "Draft saved to Drafts",
+    "formatting": "Formatting",
+    "heading": "Heading {{level}}",
+    "paragraph": "Normal text",
+    "underline": "Underline",
+    "strikethrough": "Strikethrough",
+    "bulletList": "Bulleted list",
+    "numberedList": "Numbered list",
+    "quote": "Quote",
+    "code": "Code block",
+    "alignLeft": "Align left",
+    "alignCenter": "Centre",
+    "alignRight": "Align right",
+    "clearFormatting": "Clear formatting"
   },
   "domains": {
     "title": "Domains & warmup",

@@ -34,6 +34,9 @@ export class InboxPage {
   protected readonly composeOpen = signal(false);
   protected readonly seed = signal<ComposeSeed | null>(null);
   protected readonly filter = signal<'all' | 'unread' | 'attachments'>('all');
+  // Collapsed by default: the full envelope is reference material, not what a reader opens
+  // a message for.
+  protected readonly detailsOpen = signal(false);
 
   protected readonly mailboxId = computed(() => this.context.currentId());
   protected readonly current = computed(() => this.context.current());
@@ -137,6 +140,7 @@ export class InboxPage {
 
     this.messages.read(id, message.id).subscribe((detail) => {
       this.selected.set(detail);
+      this.detailsOpen.set(false);
       this.items.update((rows) =>
         rows.map((row) => (row.id === message.id ? { ...row, read: true } : row)),
       );
@@ -254,10 +258,28 @@ export class InboxPage {
     return address.slice(0, 2).toUpperCase();
   }
 
+  // In Sent and Drafts the sender is always this mailbox, so the column worth a row's width
+  // is who it went to.
+  protected counterpart(row: MessageSummary): string {
+    return this.context.outgoing() ? (row.recipient ?? row.sender) : row.sender;
+  }
+
   protected time(iso: string): string {
     const at = new Date(iso);
 
     return at.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // The envelope wants the whole instant, not the time alone: a message read a week later
+  // is the case where "14:32" tells the reader nothing.
+  protected fullDate(iso: string): string {
+    return new Date(iso).toLocaleString(undefined, {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 
   protected dayLabel(key: string): string {

@@ -38,6 +38,18 @@ export class MailboxContext {
   );
   readonly folder = signal('INBOX');
 
+  readonly currentFolder = computed(
+    () => this.folders().find((row) => row.path === this.folder()) ?? null,
+  );
+
+  // Read off SPECIAL-USE rather than the path, for the same reason archivePath is: a server
+  // is free to call these folders whatever it likes.
+  readonly outgoing = computed(() => {
+    const use = this.currentFolder()?.specialUse;
+
+    return use === '\\Sent' || use === '\\Drafts';
+  });
+
   select(mailboxId: string): void {
     this.chosen.set(mailboxId);
     this.folder.set('INBOX');

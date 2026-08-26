@@ -66,7 +66,16 @@
     "emptyBody": "Nada nesta pasta ainda. Quando chegar mensagem, ela aparece aqui.",
     "archive": "Arquivar",
     "forward": "Encaminhar",
-    "download": "Baixar {{name}}"
+    "download": "Baixar {{name}}",
+    "to": "Para",
+    "cc": "Cc",
+    "date": "Data",
+    "folder": "Pasta",
+    "spamScore": "Pontuação de spam",
+    "messageId": "Message-ID",
+    "details": "Detalhes da mensagem",
+    "toLine": "para {{names}}",
+    "noRecipients": "sem destinatário visível"
   },
   "compose": {
     "title": "Nova mensagem",
@@ -90,7 +99,20 @@
     "linkPrompt": "Endereço do link",
     "attachmentFailed": "Não foi possível anexar {{name}}",
     "saveDraft": "Salvar rascunho",
-    "draftSaved": "Rascunho salvo em Rascunhos"
+    "draftSaved": "Rascunho salvo em Rascunhos",
+    "formatting": "Formatação",
+    "heading": "Título {{level}}",
+    "paragraph": "Texto normal",
+    "underline": "Sublinhado",
+    "strikethrough": "Tachado",
+    "bulletList": "Lista com marcadores",
+    "numberedList": "Lista numerada",
+    "quote": "Citação",
+    "code": "Bloco de código",
+    "alignLeft": "Alinhar à esquerda",
+    "alignCenter": "Centralizar",
+    "alignRight": "Alinhar à direita",
+    "clearFormatting": "Limpar formatação"
   },
   "domains": {
     "title": "Domínios e warmup",
