@@ -42,6 +42,10 @@ export class SettingsPage {
 
   protected readonly currentPassword = signal('');
   protected readonly newPassword = signal('');
+  // A password you cannot read is a password you retype until it works. Each field has its
+  // own eye, so checking the new one does not put the old one on screen too.
+  protected readonly revealCurrent = signal(false);
+  protected readonly revealNew = signal(false);
   protected readonly saving = signal(false);
   protected readonly saved = signal(false);
   protected readonly feedback = signal<string | null>(null);
@@ -71,6 +75,8 @@ export class SettingsPage {
         this.feedback.set('settings.passwordSaved');
         this.currentPassword.set('');
         this.newPassword.set('');
+        this.revealCurrent.set(false);
+        this.revealNew.set(false);
       },
       error: () => {
         this.saving.set(false);

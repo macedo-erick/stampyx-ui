@@ -2,6 +2,7 @@ import { Component, effect, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 import { MeService } from '../core/api/me.service';
 import { MailboxContext } from '../core/mailbox-context.service';
@@ -10,7 +11,7 @@ import { TopBar } from './top-bar';
 
 @Component({
   selector: 'stampyx-shell',
-  imports: [RouterOutlet, Toast, ConfirmDialog, TopBar, Sidebar],
+  imports: [RouterOutlet, Toast, ConfirmDialog, TranslocoDirective, TopBar, Sidebar],
   templateUrl: './shell.html',
   host: { class: 'flex h-full flex-col' },
 })

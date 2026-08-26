@@ -40,6 +40,13 @@ export class Sidebar {
     void this.router.navigate(['/inbox'], { queryParams: { folder: folder.path } });
   }
 
+  // A badge answers "is there anything for me here", which is unread mail - the total was
+  // just telling you how much the folder holds. Drafts is the exception: a draft is never
+  // unread, and what matters is how many are still waiting to be finished.
+  protected badge(folder: Folder): number {
+    return folder.specialUse === '\\Drafts' ? folder.total : folder.unread;
+  }
+
   protected iconFor(folder: Folder): string {
     const key = folder.path.toLowerCase();
 

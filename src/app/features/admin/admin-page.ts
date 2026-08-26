@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { TranslocoDirective } from '@jsverse/transloco';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { type AccountStatus, AdminService } from '../../core/api/admin.service';
@@ -16,6 +16,7 @@ export class AdminPage {
   private readonly admin = inject(AdminService);
   private readonly toast = inject(MessageService);
   private readonly confirm = inject(ConfirmationService);
+  private readonly transloco = inject(TranslocoService);
 
   protected readonly accounts = signal<AdminAccount[]>([]);
   protected readonly mailboxes = signal<AdminMailbox[]>([]);
@@ -44,8 +45,16 @@ export class AdminPage {
 
   protected removeAccount(account: AdminAccount): void {
     this.confirm.confirm({
-      // Deleting a tenant takes their domains, mailboxes and stored mail with it.
-      message: `${account.email} — ${String(account.mailboxCount)} mailbox(es)`,
+      header: this.transloco.translate('admin.confirmDeleteAccountTitle'),
+      // Deleting a tenant takes their domains, mailboxes and stored mail with it, and the
+      // question is the only place that gets said.
+      message: this.transloco.translate('admin.confirmDeleteAccount', {
+        email: account.email,
+        count: account.mailboxCount,
+      }),
+      acceptLabel: this.transloco.translate('common.delete'),
+      rejectLabel: this.transloco.translate('common.cancel'),
+      acceptButtonStyleClass: 'stx-pill--danger',
       accept: () => {
         this.admin.removeAccount(account.id).subscribe({
           next: () => this.reload(),
@@ -70,7 +79,13 @@ export class AdminPage {
 
   protected removeMailbox(mailbox: AdminMailbox): void {
     this.confirm.confirm({
-      message: mailbox.address,
+      header: this.transloco.translate('admin.confirmDeleteMailboxTitle'),
+      message: this.transloco.translate('admin.confirmDeleteMailbox', {
+        address: mailbox.address,
+      }),
+      acceptLabel: this.transloco.translate('common.delete'),
+      rejectLabel: this.transloco.translate('common.cancel'),
+      acceptButtonStyleClass: 'stx-pill--danger',
       accept: () => {
         this.admin.removeMailbox(mailbox.id).subscribe({
           next: () => this.reload(),

@@ -14,6 +14,7 @@ export interface SendMessageBody {
   html?: string;
   inReplyTo?: string;
   attachmentIds?: string[];
+  replacesDraftId?: string;
 }
 
 @Service()
@@ -41,6 +42,12 @@ export class MessageService {
   // Never reaches the MTA: composed and appended straight into Drafts.
   saveDraft(mailboxId: string, body: SendMessageBody): Observable<void> {
     return this.http.post<void>(`${this.base(mailboxId)}/drafts`, body);
+  }
+
+  // The whole conversation, bodies included, oldest first - and it marks the message read
+  // on the way. Opening a message is this one call, not a read followed by a thread.
+  thread(mailboxId: string, id: string): Observable<MessageDetail[]> {
+    return this.http.get<MessageDetail[]>(`${this.base(mailboxId)}/${id}/thread`);
   }
 
   // Goes through HttpClient rather than a plain link: the endpoint needs the bearer token,
