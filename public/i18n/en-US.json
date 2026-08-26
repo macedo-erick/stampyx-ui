@@ -35,7 +35,9 @@
     "retry": "Retry",
     "none": "Nothing here yet",
     "reload": "Reload",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "inbox": {
     "title": "Inbox",
@@ -50,6 +52,7 @@
     "move": "Move",
     "delete": "Delete",
     "newMail": "New message from {{sender}}",
+    "draftGone": "This draft no longer exists. The list has been refreshed.",
     "imagesBlocked": "Remote images were blocked.",
     "search": "Search messages, people, attachments",
     "today": "Today",
@@ -66,7 +69,12 @@
     "emptyBody": "Nothing in this folder yet. New mail shows up here.",
     "archive": "Archive",
     "forward": "Forward",
-    "download": "Download {{name}}"
+    "download": "Download {{name}}",
+    "toPrefix": "To",
+    "threadCount": "{{count}} messages in this conversation",
+    "threadCollapse": "Collapse message",
+    "threadExpand": "Open message",
+    "toLine": "to {{names}}"
   },
   "compose": {
     "title": "New message",
@@ -90,7 +98,14 @@
     "linkPrompt": "Link address",
     "attachmentFailed": "Could not attach {{name}}",
     "saveDraft": "Save draft",
-    "draftSaved": "Draft saved to Drafts"
+    "draftSaved": "Draft saved to Drafts",
+    "underline": "Underline",
+    "strike": "Strikethrough",
+    "bulletList": "Bulleted list",
+    "numberList": "Numbered list",
+    "quote": "Quote",
+    "clearFormat": "Clear formatting",
+    "unlink": "Remove link"
   },
   "domains": {
     "title": "Domains & warmup",
@@ -223,8 +238,6 @@
     "continue": "Continue",
     "back": "Back",
     "change": "Change",
-    "showPassword": "Show password",
-    "hidePassword": "Hide password",
     "forgotHint": "Forgot your password? Ask whoever administers your domain to reset it.",
     "footer": "Email platform"
   },
@@ -264,7 +277,11 @@
     "kinds": {
       "platform": "Platform",
       "custom": "Own"
-    }
+    },
+    "confirmDeleteAccountTitle": "Delete account",
+    "confirmDeleteAccount": "Delete {{email}} and their {{count}} mailbox(es)? Domains, mailboxes and stored mail go with it.",
+    "confirmDeleteMailboxTitle": "Delete mailbox",
+    "confirmDeleteMailbox": "Delete the mailbox {{address}}? The mail stored in it goes with it."
   },
   "folders": {
     "title": "Folders",
@@ -291,6 +308,7 @@
     "empty": "empty",
     "usedByRules": "{{count}} rule(s)",
     "createdHint": "The folder is created on the server straight away, even empty — so a rule can point at it right after.",
-    "confirmDelete": "Delete {{name}} and the {{count}} messages in it?"
+    "confirmDelete": "Delete {{name}} and the {{count}} messages in it?",
+    "confirmDeleteTitle": "Delete folder"
   }
 }

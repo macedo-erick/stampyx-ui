@@ -93,6 +93,71 @@ body {
   font-size: 14px;
 }
 
+/* The browser's own scrollbar is a wide light rail that ignores the theme, and it shows up
+   in the middle of every panel: the message list, the reading pane, the folder tree. Styled
+   once here so every scrolling area in the app looks the same. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--stx-line-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  /* The border is what insets the thumb: padding-box keeps the background off it, so the
+     bar reads as a narrow pill with room around it rather than a rail filling the gutter. */
+  border: 3px solid transparent;
+  border-radius: var(--stx-radius-pill);
+  background: var(--stx-line-strong);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--stx-muted-2);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Headless confirm dialog. PrimeNG still draws the panel it puts the template in, so it is
+   flattened here - otherwise the card inside sits in a second frame. */
+/* Both classes, so it outranks .p-dialog no matter which stylesheet the theme lands in. */
+.p-dialog.p-confirmdialog {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.stx-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 28%);
+}
+
+.stx-confirm-body {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--stx-text);
+}
+
+.stx-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .stx-mono {
   font-family: var(--stx-mono);
 }
@@ -188,6 +253,51 @@ body {
 .stx-control:focus-within {
   border-color: var(--stx-ink);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--stx-ink) 22%, transparent);
+}
+
+/* A password field you can check before saving. The control keeps being the box - only the
+   padding moves to the input, so the eye sits inside the border instead of below it. */
+.stx-secret {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+}
+
+.stx-secret > input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.stx-secret > button {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--stx-muted);
+  cursor: pointer;
+}
+
+.stx-secret > button svg {
+  width: 17px;
+  height: 17px;
+}
+
+.stx-secret > button:hover,
+.stx-secret > button.is-on {
+  color: var(--stx-ink);
 }
 
 .stx-pill {

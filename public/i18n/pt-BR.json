@@ -35,7 +35,9 @@
     "retry": "Tentar de novo",
     "none": "Nada por aqui ainda",
     "reload": "Recarregar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha"
   },
   "inbox": {
     "title": "Caixa de entrada",
@@ -50,6 +52,7 @@
     "move": "Mover",
     "delete": "Excluir",
     "newMail": "Nova mensagem de {{sender}}",
+    "draftGone": "Este rascunho não existe mais. A lista foi atualizada.",
     "imagesBlocked": "Imagens remotas foram bloqueadas.",
     "search": "Buscar mensagens, pessoas, anexos",
     "today": "Hoje",
@@ -66,7 +69,12 @@
     "emptyBody": "Nada nesta pasta ainda. Quando chegar mensagem, ela aparece aqui.",
     "archive": "Arquivar",
     "forward": "Encaminhar",
-    "download": "Baixar {{name}}"
+    "download": "Baixar {{name}}",
+    "toPrefix": "Para",
+    "threadCount": "{{count}} mensagens nesta conversa",
+    "threadCollapse": "Recolher mensagem",
+    "threadExpand": "Abrir mensagem",
+    "toLine": "para {{names}}"
   },
   "compose": {
     "title": "Nova mensagem",
@@ -90,7 +98,14 @@
     "linkPrompt": "Endereço do link",
     "attachmentFailed": "Não foi possível anexar {{name}}",
     "saveDraft": "Salvar rascunho",
-    "draftSaved": "Rascunho salvo em Rascunhos"
+    "draftSaved": "Rascunho salvo em Rascunhos",
+    "underline": "Sublinhado",
+    "strike": "Tachado",
+    "bulletList": "Lista com marcadores",
+    "numberList": "Lista numerada",
+    "quote": "Citação",
+    "clearFormat": "Limpar formatação",
+    "unlink": "Remover link"
   },
   "domains": {
     "title": "Domínios e warmup",
@@ -223,8 +238,6 @@
     "continue": "Continuar",
     "back": "Voltar",
     "change": "Trocar",
-    "showPassword": "Mostrar senha",
-    "hidePassword": "Ocultar senha",
     "forgotHint": "Esqueceu a senha? Peça a redefinição a quem administra o seu domínio.",
     "footer": "Plataforma de e-mail"
   },
@@ -264,7 +277,11 @@
     "kinds": {
       "platform": "Plataforma",
       "custom": "Próprio"
-    }
+    },
+    "confirmDeleteAccountTitle": "Excluir conta",
+    "confirmDeleteAccount": "Excluir {{email}} e as {{count}} caixa(s) dela? Os domínios, as caixas e as mensagens vão junto.",
+    "confirmDeleteMailboxTitle": "Excluir caixa",
+    "confirmDeleteMailbox": "Excluir a caixa {{address}}? As mensagens guardadas nela vão junto."
   },
   "folders": {
     "title": "Pastas",
@@ -291,6 +308,7 @@
     "empty": "vazia",
     "usedByRules": "{{count}} regra(s)",
     "createdHint": "A pasta é criada no servidor na hora, mesmo vazia — então já dá para apontar uma regra para ela.",
-    "confirmDelete": "Excluir {{name}} e as {{count}} mensagens dentro dela?"
+    "confirmDelete": "Excluir {{name}} e as {{count}} mensagens dentro dela?",
+    "confirmDeleteTitle": "Excluir pasta"
   }
 }

@@ -208,6 +208,39 @@
   color: var(--stx-text);
 }
 
+.toolbar button.is-active {
+  background: var(--stx-ink);
+  color: #fff;
+}
+
+.toolbar-split {
+  width: 1px;
+  height: 16px;
+  margin: 0 4px;
+  background: var(--stx-line);
+}
+
+/* The body is written here and read in someone else's client, so it gets the same shape a
+   mail client gives it rather than the page's own defaults. */
+.body ul,
+.body ol {
+  margin: 6px 0;
+  padding-left: 22px;
+  list-style: revert;
+}
+
+.body blockquote {
+  margin: 8px 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--stx-line-strong);
+  color: var(--stx-muted);
+}
+
+.body a {
+  color: var(--stx-ink);
+  text-decoration: underline;
+}
+
 .body {
   min-height: 132px;
   max-height: 260px;

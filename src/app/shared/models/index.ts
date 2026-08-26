@@ -104,6 +104,9 @@ export interface MessageSummary {
   readonly id: string;
   // The RFC Message-ID, which is what threads a reply.
   readonly messageId: string;
+  // Set for a message this mailbox wrote: a Sent list shows who it went to, not the sender.
+  readonly recipient: string | null;
+  readonly threadId: string | null;
   readonly sender: string;
   readonly subject: string | null;
   readonly folder: string;

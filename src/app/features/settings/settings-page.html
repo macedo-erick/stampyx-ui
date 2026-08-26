@@ -64,29 +64,69 @@
             <label for="current-password" class="mb-1 block text-sm">
               {{ t('settings.currentPassword') }}
             </label>
-            <input
-              class="stx-control"
-              id="current-password"
-              type="password"
-              class="mb-3 w-full"
-              autocomplete="current-password"
-              [value]="currentPassword()"
-              (input)="currentPassword.set($any($event.target).value)"
-            />
+            <span class="stx-control stx-secret mb-3 w-full">
+              <input
+                id="current-password"
+                [type]="revealCurrent() ? 'text' : 'password'"
+                autocomplete="current-password"
+                [value]="currentPassword()"
+                (input)="currentPassword.set($any($event.target).value)"
+              />
+              <button
+                type="button"
+                [class.is-on]="revealCurrent()"
+                (click)="revealCurrent.set(!revealCurrent())"
+                [attr.aria-label]="
+                  t(revealCurrent() ? 'common.hidePassword' : 'common.showPassword')
+                "
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"></path>
+                  <circle cx="12" cy="12" r="2.6"></circle>
+                </svg>
+              </button>
+            </span>
           }
 
           <label for="new-password" class="mb-1 block text-sm">
             {{ t('settings.newPassword') }}
           </label>
-          <input
-            class="stx-control"
-            id="new-password"
-            type="password"
-            class="mb-3 w-full"
-            autocomplete="new-password"
-            [value]="newPassword()"
-            (input)="newPassword.set($any($event.target).value)"
-          />
+          <span class="stx-control stx-secret mb-3 w-full">
+            <input
+              id="new-password"
+              [type]="revealNew() ? 'text' : 'password'"
+              autocomplete="new-password"
+              [value]="newPassword()"
+              (input)="newPassword.set($any($event.target).value)"
+            />
+            <button
+              type="button"
+              [class.is-on]="revealNew()"
+              (click)="revealNew.set(!revealNew())"
+              [attr.aria-label]="t(revealNew() ? 'common.hidePassword' : 'common.showPassword')"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"></path>
+                <circle cx="12" cy="12" r="2.6"></circle>
+              </svg>
+            </button>
+          </span>
 
           @if (feedback(); as key) {
             <p

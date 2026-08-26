@@ -20,9 +20,15 @@ import type { DraftAttachment, Mailbox } from '../../shared/models';
 // onto the original, a forward starts with an empty To and carries the text along.
 export interface ComposeSeed {
   readonly to: string[];
+  readonly cc?: string[];
   readonly subject: string;
   readonly inReplyTo: string | null;
   readonly body: string;
+  // A draft reopens with the markup it was written with, not a flattened copy of it.
+  readonly html?: string | null;
+  // Set when the composer was opened from a draft: saving or sending removes that draft
+  // instead of leaving a trail of half-written copies behind.
+  readonly replacesDraftId?: string;
 }
 
 // Mirrors MAIL_MAX_ATTACHMENT_BYTES. The server enforces it either way; this is only so the
@@ -49,6 +55,10 @@ export class ComposePanel {
   readonly seed = input<ComposeSeed | null>(null);
   readonly closed = output<void>();
   readonly sent = output<void>();
+  // Distinct from `closed`: a saved draft is a new row in Drafts under a new id, and the
+  // list has to be refetched. Closing on its own left the old row on screen, and clicking
+  // it asked for a message that no longer exists.
+  readonly saved = output<void>();
 
   private readonly messages = inject(MessageService);
   private readonly attachmentsApi = inject(AttachmentService);
@@ -69,30 +79,40 @@ export class ComposePanel {
   protected readonly savingDraft = signal(false);
   protected readonly uploading = signal(false);
   protected readonly minimized = signal(false);
+  protected readonly activeFormats = signal<ReadonlySet<string>>(new Set());
   protected readonly dragging = signal(false);
   private readonly prefilled = signal(false);
 
   protected readonly from = computed(() => this.senders()[0]?.address ?? '');
 
   private readonly inReplyTo = signal<string | null>(null);
+  private readonly replaces = signal<string | null>(null);
 
   constructor() {
     // Runs once, when the panel opens: after that the fields belong to whoever is typing.
+    // It waits for the editor: the effect's first pass can land before the view exists, and
+    // marking the seed as applied there dropped the body on the floor - which is why a
+    // forward arrived with its subject and an empty message.
     effect(() => {
       const context = this.seed();
+      const editor = this.editor()?.nativeElement;
 
-      if (context === null || this.prefilled()) {
+      if (context === null || this.prefilled() || editor === undefined) {
         return;
       }
 
       this.prefilled.set(true);
       this.to.set([...context.to]);
+      this.cc.set([...(context.cc ?? [])]);
+      this.showCc.set((context.cc ?? []).length > 0);
       this.subject.set(context.subject);
       this.inReplyTo.set(context.inReplyTo);
+      this.replaces.set(context.replacesDraftId ?? null);
 
-      const editor = this.editor()?.nativeElement;
-
-      if (editor !== undefined && context.body !== '') {
+      if (context.html != null && context.html !== '') {
+        // Sanitized server-side on the way out of IMAP, so what comes back is safe to mount.
+        editor.innerHTML = context.html;
+      } else if (context.body !== '') {
         editor.innerText = context.body;
       }
     });
@@ -151,9 +171,12 @@ export class ComposePanel {
     return address.slice(0, 2).toUpperCase();
   }
 
-  protected format(command: 'bold' | 'italic'): void {
+  // execCommand is deprecated and still the only formatting API a contenteditable has
+  // without pulling in an editor library. The alternative is 300 kB of Quill for bold.
+  protected format(command: string, value?: string): void {
     this.editor()?.nativeElement.focus();
-    document.execCommand(command);
+    document.execCommand(command, false, value);
+    this.syncFormats();
   }
 
   protected addLink(): void {
@@ -163,8 +186,20 @@ export class ComposePanel {
       return;
     }
 
-    this.editor()?.nativeElement.focus();
-    document.execCommand('createLink', false, href.trim());
+    const target = href.trim();
+
+    // A bare domain becomes a relative link and goes nowhere from a mail client.
+    this.format('createLink', /^[a-z][a-z0-9+.-]*:/i.test(target) ? target : `https://${target}`);
+  }
+
+  // So the toolbar shows what the caret is sitting in, rather than being a row of buttons
+  // that never look pressed.
+  protected syncFormats(): void {
+    this.activeFormats.set(new Set(TRACKED.filter((command) => safeState(command))));
+  }
+
+  protected isActive(command: string): boolean {
+    return this.activeFormats().has(command);
   }
 
   protected choose(): void {
@@ -247,6 +282,7 @@ export class ComposePanel {
         // Only when the body actually carries markup: a plain note should stay plain.
         ...(html.includes('<') ? { html } : {}),
         ...(this.inReplyTo() === null ? {} : { inReplyTo: this.inReplyTo() as string }),
+        ...(this.replaces() === null ? {} : { replacesDraftId: this.replaces() as string }),
         attachmentIds: this.attachments().map((row) => row.id),
       })
       .subscribe({
@@ -263,7 +299,7 @@ export class ComposePanel {
   }
 
   // A draft never reaches the MTA: it is filed in Drafts so it can be picked up from any
-  // client. Reopening one to keep editing is not built yet.
+  // client. Saving replaces the previous one, so it comes back with a new id.
   protected saveDraft(): void {
     if (this.savingDraft()) {
       return;
@@ -283,6 +319,7 @@ export class ComposePanel {
         text: element?.innerText ?? '',
         ...(html.includes('<') ? { html } : {}),
         attachmentIds: this.attachments().map((row) => row.id),
+        ...(this.replaces() === null ? {} : { replacesDraftId: this.replaces() as string }),
       })
       .subscribe({
         next: () => {
@@ -291,7 +328,7 @@ export class ComposePanel {
             severity: 'success',
             summary: this.transloco.translate('compose.draftSaved'),
           });
-          this.closed.emit();
+          this.saved.emit();
         },
         error: () => this.savingDraft.set(false),
       });
@@ -336,5 +373,24 @@ export class ComposePanel {
 
   private bucket(list: 'to' | 'cc' | 'bcc') {
     return list === 'to' ? this.to : list === 'cc' ? this.cc : this.bcc;
+  }
+}
+
+// The commands whose pressed state the toolbar reflects.
+const TRACKED = [
+  'bold',
+  'italic',
+  'underline',
+  'strikeThrough',
+  'insertUnorderedList',
+  'insertOrderedList',
+];
+
+// queryCommandState throws in some browsers when the selection is outside the document.
+function safeState(command: string): boolean {
+  try {
+    return document.queryCommandState(command);
+  } catch {
+    return false;
   }
 }

@@ -95,10 +95,14 @@ export class FoldersPage {
     }
 
     this.confirm.confirm({
+      header: this.transloco.translate('folders.confirmDeleteTitle'),
       message: this.transloco.translate('folders.confirmDelete', {
         name: folder.path,
         count: folder.total,
       }),
+      acceptLabel: this.transloco.translate('common.delete'),
+      rejectLabel: this.transloco.translate('common.cancel'),
+      acceptButtonStyleClass: 'stx-pill--danger',
       accept: () => {
         this.api.remove(mailboxId, folder.path).subscribe({
           // The server refuses when a rule files into it, and its message names how many.

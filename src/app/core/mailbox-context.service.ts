@@ -1,8 +1,10 @@
 import { Service, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import type { Folder, Mailbox } from '../shared/models';
 import { FolderService } from './api/folder.service';
 import { MeService } from './api/me.service';
+import { RealtimeService } from './realtime.service';
 
 // The shell draws the folder list and the inbox reads messages from it, so the selected
 // mailbox and folder cannot live inside either one.
@@ -10,6 +12,14 @@ import { MeService } from './api/me.service';
 export class MailboxContext {
   private readonly me = inject(MeService);
   private readonly foldersApi = inject(FolderService);
+  private readonly realtime = inject(RealtimeService);
+
+  constructor() {
+    // Mail arriving is the one thing that changes a badge without the panel doing anything,
+    // so it is the one thing that has to refetch them. Everything else - reading, moving,
+    // deleting - already reloads on its way out.
+    this.realtime.received$.pipe(takeUntilDestroyed()).subscribe(() => this.reloadFolders());
+  }
 
   private readonly chosen = signal<string | null>(null);
 
@@ -35,6 +45,14 @@ export class MailboxContext {
 
   readonly archivePath = computed(
     () => this.folders().find((row) => row.specialUse === '\\Archive')?.path ?? null,
+  );
+
+  readonly draftsPath = computed(
+    () => this.folders().find((row) => row.specialUse === '\\Drafts')?.path ?? null,
+  );
+
+  readonly sentPath = computed(
+    () => this.folders().find((row) => row.specialUse === '\\Sent')?.path ?? null,
   );
   readonly folder = signal('INBOX');
 
