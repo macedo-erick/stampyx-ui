@@ -9,8 +9,10 @@ import { Component, input } from '@angular/core';
     >
       <div class="min-w-0">
         @if (eyebrow(); as text) {
+          <!-- A long hint wrapped to three lines of uppercase mono on a phone, pushing the
+               heading down and squeezing the action beside it. One line, always. -->
           <div
-            class="stx-mono text-[11px] uppercase tracking-widest"
+            class="stx-mono truncate text-[11px] uppercase tracking-widest"
             [style.color]="'var(--stx-muted-2)'"
           >
             {{ text }}
@@ -18,7 +20,10 @@ import { Component, input } from '@angular/core';
         }
         <h1 class="truncate text-lg font-semibold">{{ heading() }}</h1>
       </div>
-      <ng-content />
+
+      <div class="stx-page-head-actions flex shrink-0 items-center gap-2">
+        <ng-content />
+      </div>
     </header>
   `,
 })

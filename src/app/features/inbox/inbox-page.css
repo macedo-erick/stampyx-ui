@@ -58,4 +58,26 @@
   .compose-fab.is-hidden {
     display: none;
   }
+
+  /* Back, reply, forward, archive and delete at desktop sizes came to more than a 390px
+     bar holds, and the two icons on the right were the ones that fell off it. */
+  .reader-bar {
+    padding-inline: 12px;
+    gap: 8px;
+  }
+
+  .reader-bar .stx-pill {
+    min-width: 0;
+    padding: 9px 12px;
+    font-size: 12.5px;
+  }
+
+  /* Last resort for a locale with longer words than pt-BR: the label gives way before
+     anything leaves the bar. */
+  .reader-bar .pill-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }

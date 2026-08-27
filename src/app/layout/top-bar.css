@@ -125,8 +125,8 @@
 /* Below the breakpoint the sidebar is a drawer, so the bar grows a button that opens it. */
 @media (max-width: 899px) {
   :host {
-    gap: 4px;
-    padding: 0 8px 0 4px;
+    gap: 6px;
+    padding: 0 12px;
   }
 
   .hamburger,
@@ -134,22 +134,36 @@
     display: grid;
   }
 
+  /* The glyph sits centred in a 44px tap target, so it needs pulling back out to the
+     same optical margin the avatar has on the other side. */
+  .hamburger {
+    margin-left: -10px;
+  }
+
+  /* space-between spread the gap between every item, which left the brand adrift in the
+     middle. Collecting the slack here pins the brand left and the actions right. */
+  .brand {
+    margin-right: auto;
+  }
+
   /* A flex:1 field is what pushed the actions off-screen at 390px. */
   .search {
     display: none;
   }
 
+  /* Shorter than the desktop field and inset from both edges, rather than a slab
+     spanning the whole bar. */
   .search.is-open {
     display: flex;
     flex: 1;
     max-width: none;
-    padding-right: 4px;
+    padding: 3px 4px 3px 12px;
   }
 
   .search-close {
     display: grid;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
   }
 
   .is-hidden {
