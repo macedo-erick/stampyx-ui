@@ -105,6 +105,8 @@
     "attachmentFailed": "Não foi possível anexar {{name}}",
     "saveDraft": "Salvar rascunho",
     "draftSaved": "Rascunho salvo em Rascunhos",
+    "draftDiscarded": "Rascunho descartado",
+    "discardFailed": "Não foi possível descartar o rascunho",
     "paragraph": "Texto normal",
     "underline": "Sublinhado",
     "strikethrough": "Tachado",

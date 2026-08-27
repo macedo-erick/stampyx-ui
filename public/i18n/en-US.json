@@ -105,6 +105,8 @@
     "attachmentFailed": "Could not attach {{name}}",
     "saveDraft": "Save draft",
     "draftSaved": "Draft saved to Drafts",
+    "draftDiscarded": "Draft discarded",
+    "discardFailed": "Could not discard the draft",
     "paragraph": "Normal text",
     "underline": "Underline",
     "strikethrough": "Strikethrough",

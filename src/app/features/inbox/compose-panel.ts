@@ -62,6 +62,9 @@ export class ComposePanel {
   // list has to be refetched. Closing on its own left the old row on screen, and clicking
   // it asked for a message that no longer exists.
   readonly saved = output<void>();
+  // Also distinct from `closed`: discarding deletes the draft the composer was opened from,
+  // so the list behind it is one row lighter and the folder counts have moved.
+  readonly discarded = output<void>();
 
   private readonly messages = inject(MessageService);
   private readonly attachmentsApi = inject(AttachmentService);
@@ -79,6 +82,7 @@ export class ComposePanel {
   protected readonly attachments = signal<DraftAttachment[]>([]);
   protected readonly sending = signal(false);
   protected readonly savingDraft = signal(false);
+  protected readonly discarding = signal(false);
   protected readonly uploading = signal(false);
   protected readonly minimized = signal(false);
   protected readonly dragging = signal(false);
@@ -334,6 +338,47 @@ export class ComposePanel {
 
   protected close(): void {
     this.closed.emit();
+  }
+
+  // Discarding is not the same as closing. A composer opened from Drafts left that draft
+  // sitting there, and since saving and sending are the only things that pass
+  // `replacesDraftId`, sending the message was the only way to be rid of one. It goes where
+  // any deleted message goes - Trash - so a mis-click is still recoverable.
+  protected discard(): void {
+    if (this.discarding()) {
+      return;
+    }
+
+    const draftId = this.replaces();
+
+    // Nothing was ever filed: a composer that is not backed by a draft has nothing to delete.
+    if (draftId === null) {
+      this.closed.emit();
+
+      return;
+    }
+
+    this.discarding.set(true);
+
+    this.messages.remove(this.mailboxId(), draftId).subscribe({
+      next: () => {
+        this.discarding.set(false);
+        this.toast.add({
+          severity: 'success',
+          summary: this.transloco.translate('compose.draftDiscarded'),
+        });
+        this.discarded.emit();
+      },
+      // The draft survived, so the panel stays open with the text still in it rather than
+      // closing over writing the user can no longer get back to.
+      error: () => {
+        this.discarding.set(false);
+        this.toast.add({
+          severity: 'error',
+          summary: this.transloco.translate('compose.discardFailed'),
+        });
+      },
+    });
   }
 
   private attach(files: readonly File[]): void {

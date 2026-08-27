@@ -303,6 +303,14 @@ export class InboxPage {
     this.context.reloadFolders();
   }
 
+  // Discarding deleted the draft, so the row it was opened from is gone and Drafts counts
+  // one fewer. Same reload as a save, for the same reason.
+  protected onDraftDiscarded(): void {
+    this.closeCompose();
+    this.refresh();
+    this.context.reloadFolders();
+  }
+
   // The compose flag has to leave the URL too: the sidebar navigates to ?compose=1, and
   // navigating to a URL the router is already on emits nothing, so the panel would never
   // reopen after the first time.

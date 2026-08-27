@@ -24,6 +24,13 @@ function open(seed: ComposeSeed) {
   return fixture;
 }
 
+// The footer's two buttons share a class: save first, discard second.
+function discardButton(fixture: { nativeElement: HTMLElement }): HTMLButtonElement {
+  const buttons: HTMLButtonElement[] = [...fixture.nativeElement.querySelectorAll('button')];
+
+  return buttons.filter((button) => button.classList.contains('discard'))[1];
+}
+
 describe('ComposePanel', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -79,6 +86,49 @@ describe('ComposePanel', () => {
 
     expect(saved).toBe(1);
     expect(closed).toBe(0);
+  });
+
+  // Discard was a plain close: the draft it was opened from stayed in Drafts, and since only
+  // saving and sending pass `replacesDraftId`, sending was the only way to be rid of one.
+  it('deletes the draft it was opened from when discarded', () => {
+    const draftId = '3a5d0e7c-1111-4000-8000-000000000000';
+    const fixture = open({
+      to: [],
+      subject: 'Rascunho',
+      inReplyTo: null,
+      body: 'meio escrito',
+      replacesDraftId: draftId,
+    });
+
+    let discarded = 0;
+    let closed = 0;
+
+    fixture.componentInstance.discarded.subscribe(() => (discarded += 1));
+    fixture.componentInstance.closed.subscribe(() => (closed += 1));
+
+    discardButton(fixture).click();
+
+    TestBed.inject(HttpTestingController)
+      .expectOne((request) => request.method === 'DELETE' && request.url.endsWith(`/${draftId}`))
+      .flush(null);
+
+    expect(discarded).toBe(1);
+    expect(closed).toBe(0);
+  });
+
+  // A composer that was never filed has nothing to delete, and asking to delete a draft id
+  // that does not exist would fail the request rather than close the panel.
+  it('just closes when it was not opened from a draft', () => {
+    const fixture = open({ to: [], subject: 'Nova', inReplyTo: null, body: '' });
+
+    let closed = 0;
+
+    fixture.componentInstance.closed.subscribe(() => (closed += 1));
+
+    discardButton(fixture).click();
+
+    TestBed.inject(HttpTestingController).verify();
+    expect(closed).toBe(1);
   });
 
   it('fills the recipients a reply was opened with', () => {
