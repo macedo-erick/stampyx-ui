@@ -10,44 +10,39 @@ describe('inlineQuillFormatting', () => {
     expect(html).not.toContain('ql-align-center');
   });
 
-  // Quill 2 renders a bulleted list as <ol> with the marker drawn by a CSS counter. Sent as
-  // it stands, the recipient sees a numbered list where the writer typed bullets.
-  it('rewrites a bulleted list as a real <ul> rather than a numbered <ol>', () => {
+  // getSemanticHTML already emits the right tag, so this is not a rescue: clients disagree
+  // about default markers and padding, and the message states both rather than hoping.
+  it('states the marker and padding on a bulleted list', () => {
+    const html = inlineQuillFormatting('<ul><li>one</li><li>two</li></ul>');
+
+    expect(html).toContain('list-style-type:disc');
+    expect(html).toContain('padding-left:1.5em');
+    expect(html).toContain('one');
+  });
+
+  it('states decimal on a numbered list', () => {
+    const html = inlineQuillFormatting('<ol><li>first</li></ol>');
+
+    expect(html).toContain('list-style-type:decimal');
+  });
+
+  // The one place data-list outlives getSemanticHTML: a checklist has no plain-HTML form.
+  it('drops the checklist marker plain HTML cannot express', () => {
     const html = inlineQuillFormatting(
-      '<ol><li data-list="bullet"><span class="ql-ui"></span>one</li>' +
-        '<li data-list="bullet"><span class="ql-ui"></span>two</li></ol>',
+      '<ul><li data-list="checked"><span class="ql-ui"></span>done</li></ul>',
     );
 
-    expect(html).toContain('<ul');
-    expect(html).toContain('list-style-type:disc');
-    expect(html).not.toContain('<ol');
     expect(html).not.toContain('data-list');
     expect(html).not.toContain('ql-ui');
-    expect(html).toContain('one');
-    expect(html).toContain('two');
+    expect(html).toContain('done');
   });
 
-  it('keeps a numbered list numbered', () => {
-    const html = inlineQuillFormatting(
-      '<ol><li data-list="ordered"><span class="ql-ui"></span>first</li></ol>',
-    );
-
-    expect(html).toContain('<ol');
-    expect(html).toContain('list-style-type:decimal');
-    expect(html).not.toContain('<ul');
-  });
-
-  it('turns a code block container into a <pre>, which needs no stylesheet to be a code block', () => {
-    const html = inlineQuillFormatting(
-      '<div class="ql-code-block-container">' +
-        '<div class="ql-code-block">const a = 1;</div>' +
-        '<div class="ql-code-block">const b = 2;</div>' +
-        '</div>',
-    );
+  it('gives the <pre> a code block needs styling it can carry on its own', () => {
+    const html = inlineQuillFormatting('<pre>const a = 1;</pre>');
 
     expect(html).toContain('<pre');
-    expect(html).toContain('const a = 1;\nconst b = 2;');
-    expect(html).not.toContain('ql-code-block');
+    expect(html).toContain('font-family:Monaco');
+    expect(html).toContain('const a = 1;');
   });
 
   it('converts indent steps to the padding Quill draws them with', () => {
@@ -84,6 +79,20 @@ describe('inlineQuillFormatting', () => {
   it('returns plain markup untouched, so a note with no formatting is not rewritten', () => {
     expect(inlineQuillFormatting('<p>just a line</p>')).toBe('<p>just a line</p>');
     expect(inlineQuillFormatting('')).toBe('');
+  });
+
+  // The formats a class attributor holds are the whole reason this exists: quill.js
+  // registers align as AlignClass, and convertHTML copies the block's outerHTML verbatim.
+  it('inlines every class-held format, which semantic HTML leaves as a class', () => {
+    const html = inlineQuillFormatting(
+      '<p class="ql-align-center ql-size-large ql-font-monospace ql-indent-1">x</p>',
+    );
+
+    expect(html).toContain('text-align:center');
+    expect(html).toContain('font-size:1.5em');
+    expect(html).toContain('font-family:Monaco');
+    expect(html).toContain('padding-left:3em');
+    expect(html).not.toContain('ql-');
   });
 });
 

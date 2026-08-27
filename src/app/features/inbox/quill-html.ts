@@ -1,12 +1,20 @@
-// Quill expresses several formats as its own CSS classes rather than as tags or inline
-// styles, which works in the composer because Quill's stylesheet is loaded there. A message
-// leaves that page: the recipient's client has no `ql-*` rules, and it cannot be given any -
-// the API's sanitizer strips <style> outright (FORBID_TAGS in sanitize.ts), and every mail
-// client worth the name drops it too. So whatever Quill expressed as a class has to be
-// rewritten as an inline style before the HTML goes on the wire.
+// What p-editor hands over as htmlValue is Quill 2's getSemanticHTML(), not the editor's own
+// innerHTML, and the two differ in ways that matter here. getSemanticHTML already emits real
+// <ul>/<ol> for lists (core/editor.js getListType) and a real <pre> for code blocks
+// (formats/code.js CodeBlockContainer.html), so neither needs rescuing.
 //
-// The values here are read off Quill 2.0.3's own quill.core.css, so the recipient sees what
-// the writer saw.
+// What it does NOT resolve is anything held by a class attributor: quill.js registers
+// 'formats/align' as AlignClass and indent as a ClassAttributor, and the block path in
+// convertHTML copies the DOM node's outerHTML verbatim - classes and all. Only code blocks
+// override html(), so a <p class="ql-align-center"> arrives with its class intact.
+//
+// Those classes mean nothing once the message leaves this page. The recipient's client has
+// no ql-* rules and cannot be given any: the API's sanitizer strips <style> outright
+// (FORBID_TAGS in sanitize.ts), and mail clients drop it too. So alignment and indent get
+// rewritten as inline styles, with the values read off Quill 2.0.3's own quill.core.css.
+//
+// The list and <pre> handling below is not a fix for a broken tag - it is email hardening:
+// clients disagree about default list markers and padding, so both are stated outright.
 
 // .ql-editor .ql-align-center { text-align: center }, and so on.
 const ALIGNMENT: Readonly<Record<string, string>> = {
@@ -33,9 +41,6 @@ const INDENT_STEP_EM = 3;
 const LIST_ITEM_BASE_EM = 1.5;
 
 const CODE_BLOCK_STYLE =
-  'margin:0;padding:0;font-family:Monaco,"Courier New",monospace;white-space:pre-wrap';
-
-const CODE_CONTAINER_STYLE =
   'padding:0.7em 0.9em;border-radius:10px;background:#f4f4f5;' +
   'font-family:Monaco,"Courier New",monospace;font-size:0.92em;white-space:pre-wrap';
 
@@ -45,59 +50,27 @@ function appendStyle(element: Element, declaration: string): void {
   element.setAttribute('style', existing === '' ? declaration : `${existing};${declaration}`);
 }
 
-// Quill 2 renders a bulleted list as <ol> too, with the marker drawn by a CSS counter on a
-// <span class="ql-ui"> that is empty in the markup. Left alone, a bulleted list arrives at
-// the recipient numbered, because <ol> is what the tag says.
-function rewriteList(list: Element, doc: Document): void {
-  const items = [...list.children].filter((child) => child.tagName === 'LI');
-  const bulleted = items.some((item) => item.getAttribute('data-list') === 'bullet');
+// The tag is already right; this only states the marker and padding that clients otherwise
+// each pick for themselves. data-list survives semantic HTML for checklists, where it is the
+// only trace of a format plain HTML cannot express.
+function hardenList(list: Element): void {
+  appendStyle(
+    list,
+    `padding-left:1.5em;list-style-type:${list.tagName === 'UL' ? 'disc' : 'decimal'}`,
+  );
 
-  // A checklist has no honest plain-HTML equivalent; a bullet is the closest thing that
-  // still reads as a list rather than as mis-numbered prose.
-  const marker = bulleted ? 'disc' : 'decimal';
-  const target = bulleted ? 'ul' : 'ol';
-
-  const replacement = doc.createElement(target);
-
-  for (const attribute of list.attributes) {
-    replacement.setAttribute(attribute.name, attribute.value);
-  }
-
-  appendStyle(replacement, `padding-left:1.5em;list-style-type:${marker}`);
-
-  while (list.firstChild !== null) {
-    replacement.appendChild(list.firstChild);
-  }
-
-  list.replaceWith(replacement);
-
-  for (const item of [...replacement.children]) {
+  for (const item of [...list.children]) {
     item.removeAttribute('data-list');
-    // The counter markers live in these and render as nothing without Quill's CSS.
+    // Quill draws the marker with a CSS counter on these; they are empty without its CSS.
     for (const ui of [...item.querySelectorAll('.ql-ui')]) {
       ui.remove();
     }
   }
 }
 
-// <div class="ql-code-block-container"><div class="ql-code-block">…</div></div> is a code
-// block only while Quill's CSS is loaded. As <pre> it is one anywhere.
-function rewriteCodeBlock(container: Element, doc: Document): void {
-  const pre = doc.createElement('pre');
-
-  appendStyle(pre, CODE_CONTAINER_STYLE);
-
-  const lines = [...container.querySelectorAll('.ql-code-block')];
-
-  if (lines.length === 0) {
-    pre.textContent = container.textContent;
-  } else {
-    pre.textContent = lines.map((line) => line.textContent ?? '').join('\n');
-  }
-
-  // A lone <pre> keeps the whitespace; the per-line divs would each add a break on top.
+// getSemanticHTML already gives a bare <pre>; it just carries no styling of its own.
+function hardenCodeBlock(pre: Element): void {
   appendStyle(pre, CODE_BLOCK_STYLE);
-  container.replaceWith(pre);
 }
 
 function inlineClasses(element: Element): void {
@@ -157,17 +130,14 @@ export function inlineQuillFormatting(html: string): string {
     return '';
   }
 
-  const doc = new DOMParser().parseFromString(`<body>${html}</body>`, 'text/html');
-  const root = doc.body;
+  const root = new DOMParser().parseFromString(`<body>${html}</body>`, 'text/html').body;
 
-  // Containers first: rewriting a list replaces the node, so collecting afterwards would
-  // walk elements that are no longer attached.
-  for (const container of [...root.querySelectorAll('.ql-code-block-container')]) {
-    rewriteCodeBlock(container, doc);
+  for (const pre of [...root.querySelectorAll('pre')]) {
+    hardenCodeBlock(pre);
   }
 
   for (const list of [...root.querySelectorAll('ol, ul')]) {
-    rewriteList(list, doc);
+    hardenList(list);
   }
 
   for (const element of [...root.querySelectorAll('*')]) {
