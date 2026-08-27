@@ -10,6 +10,7 @@ import { MailboxContext } from '../../core/mailbox-context.service';
 import { RealtimeService, toSummary } from '../../core/realtime.service';
 import type { MessageDetail, MessageSummary } from '../../shared/models';
 import { EmptyState } from '../../shared/ui/empty-state';
+import { currentLocale } from '../../shared/util/locale';
 import { ComposePanel, type ComposeSeed } from './compose-panel';
 
 @Component({
@@ -383,7 +384,10 @@ export class InboxPage {
     const mb = bytes / (1024 * 1024);
 
     return mb >= 1
-      ? `${mb.toFixed(1).replace('.', ',')} MB`
+      ? `${mb.toLocaleString(currentLocale(), {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 1,
+        })} MB`
       : `${String(Math.round(bytes / 1024))} KB`;
   }
 
@@ -395,14 +399,16 @@ export class InboxPage {
     return address.slice(0, 2).toUpperCase();
   }
 
+  // Intl's `undefined` locale means the browser's, not the app's, so the dates stayed in
+  // en-US however the panel was set. Reading the signal also re-renders them on a switch.
   protected time(iso: string): string {
     const at = new Date(iso);
 
-    return at.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    return at.toLocaleTimeString(currentLocale(), { hour: '2-digit', minute: '2-digit' });
   }
 
   protected fullDate(iso: string): string {
-    return new Date(iso).toLocaleString(undefined, {
+    return new Date(iso).toLocaleString(currentLocale(), {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
@@ -423,7 +429,7 @@ export class InboxPage {
       return this.transloco.translate('inbox.yesterday');
     }
 
-    return new Date(key).toLocaleDateString(undefined, { day: '2-digit', month: 'short' });
+    return new Date(key).toLocaleDateString(currentLocale(), { day: '2-digit', month: 'short' });
   }
 
   private dayKey(iso: string): string {
