@@ -1,12 +1,12 @@
 <ng-container *transloco="let t">
   <stampyx-page-header [heading]="t('settings.title')" />
 
-  <div class="flex-1 overflow-auto p-6">
+  <div class="stx-page-body flex-1 overflow-auto p-6">
     <div class="mx-auto flex max-w-xl flex-col gap-6">
       <section class="stx-card p-4">
         <h2 class="mb-3 text-sm font-semibold">{{ t('settings.appearance') }}</h2>
 
-        <div class="mb-4 flex items-center justify-between gap-4">
+        <div class="stx-field-row mb-4 flex items-center justify-between gap-4">
           <label for="theme-toggle" class="text-sm">{{ t('settings.theme') }}</label>
           <button
             id="theme-toggle"
@@ -20,7 +20,7 @@
           </button>
         </div>
 
-        <div class="flex items-center justify-between gap-4">
+        <div class="stx-field-row flex items-center justify-between gap-4">
           <span id="locale-label" class="text-sm">{{ t('settings.language') }}</span>
           <div
             class="flex gap-1 rounded-full p-1"

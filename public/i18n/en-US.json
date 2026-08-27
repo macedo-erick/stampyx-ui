@@ -19,7 +19,9 @@
     "settings": "Settings",
     "signOut": "Sign out",
     "admin": "Administration",
-    "manage": "Manage"
+    "manage": "Manage",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "theme": {
     "toDark": "Switch to dark theme",
@@ -35,6 +37,7 @@
     "retry": "Retry",
     "none": "Nothing here yet",
     "reload": "Reload",
+    "close": "Close",
     "confirm": "Confirm",
     "showPassword": "Show password",
     "hidePassword": "Hide password"
@@ -69,6 +72,8 @@
     "emptyBody": "Nothing in this folder yet. New mail shows up here.",
     "archive": "Archive",
     "forward": "Forward",
+    "back": "Back",
+    "formatting": "Formatting",
     "download": "Download {{name}}",
     "toPrefix": "To",
     "date": "Date",

@@ -8,6 +8,18 @@
   </main>
 </div>
 
+<ng-container *transloco="let t">
+  <button
+    type="button"
+    class="stx-scrim"
+    [class.is-open]="nav.open()"
+    [attr.aria-label]="t('nav.closeMenu')"
+    [attr.aria-hidden]="nav.open() ? null : 'true'"
+    [attr.tabindex]="nav.open() ? null : -1"
+    (click)="nav.close()"
+  ></button>
+</ng-container>
+
 <p-toast position="bottom-right" />
 
 <!-- ConfirmationService only posts an event: without this rendered, every confirm() was a silent

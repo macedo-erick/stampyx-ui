@@ -100,3 +100,74 @@
   font-size: 12px;
   font-weight: 700;
 }
+
+.hamburger,
+.search-open,
+.search-close {
+  display: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--stx-radius-pill);
+  background: transparent;
+  color: var(--stx-muted);
+  cursor: pointer;
+}
+
+.hamburger:hover,
+.search-open:hover,
+.search-close:hover {
+  color: var(--stx-text);
+}
+
+/* Below the breakpoint the sidebar is a drawer, so the bar grows a button that opens it. */
+@media (max-width: 899px) {
+  :host {
+    gap: 4px;
+    padding: 0 8px 0 4px;
+  }
+
+  .hamburger,
+  .search-open {
+    display: grid;
+  }
+
+  /* A flex:1 field is what pushed the actions off-screen at 390px. */
+  .search {
+    display: none;
+  }
+
+  .search.is-open {
+    display: flex;
+    flex: 1;
+    max-width: none;
+    padding-right: 4px;
+  }
+
+  .search-close {
+    display: grid;
+    width: 36px;
+    height: 36px;
+  }
+
+  .is-hidden {
+    display: none;
+  }
+
+  /* Both live in the drawer's footer down here. */
+  .desktop-only {
+    display: none;
+  }
+
+  .icon-button,
+  .avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  :host(.is-searching) .brand {
+    display: none;
+  }
+}
