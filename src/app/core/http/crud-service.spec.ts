@@ -34,7 +34,6 @@ describe('CrudService', () => {
     http = TestBed.inject(HttpTestingController);
   });
 
-  // Resource values land a task later, so waiting on a macrotask is what makes them observable.
   async function settle() {
     await new Promise((resolve) => setTimeout(resolve, 0));
     TestBed.tick();
@@ -131,7 +130,6 @@ describe('CrudService', () => {
     expect(service.items()).toEqual([]);
   });
 
-  // `items()` rethrows rather than falling back, so a template that skips `hasError()` takes the page down.
   it('reports a failed collection load, and refuses to hand back items until it is retried', async () => {
     TestBed.tick();
     http.expectOne(BASE_URL).flush('nope', { status: 500, statusText: 'Server Error' });

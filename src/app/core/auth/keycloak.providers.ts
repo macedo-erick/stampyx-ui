@@ -43,6 +43,5 @@ export const provideKeycloakAuth = (): EnvironmentProviders =>
 
 export const keycloakBearerTokenConfig: Provider = {
   provide: INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
-  // Anchored to the API origin so the access token cannot reach a third-party host.
   useValue: [apiUrlCondition],
 };

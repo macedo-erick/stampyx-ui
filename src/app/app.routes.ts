@@ -50,7 +50,6 @@ export const routes: Routes = [
     ],
   },
   {
-    // Outside the shell: neither has a nav to show, and the login has no session yet.
     path: 'login',
     title: 'titles.login',
     loadComponent: () => import('./features/login/login-page').then((m) => m.LoginPage),

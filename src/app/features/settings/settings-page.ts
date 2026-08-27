@@ -34,14 +34,12 @@ export class SettingsPage {
 
   protected readonly isMailboxSession = computed(() => this.me.kind() === 'mailbox');
 
-  // A mailbox user has one password; an account holder is setting the mail password an external client needs.
   protected readonly targetMailbox = computed(
     () => this.me.mailboxes().find((row) => this.isMailboxSession() || row.platform) ?? null,
   );
 
   protected readonly currentPassword = signal('');
   protected readonly newPassword = signal('');
-  // One eye per field, so checking the new password does not put the old one on screen too.
   protected readonly revealCurrent = signal(false);
   protected readonly revealNew = signal(false);
   protected readonly saving = signal(false);

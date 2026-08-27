@@ -102,12 +102,9 @@ export interface AdminMailbox {
 
 export interface MessageSummary {
   readonly id: string;
-  // The RFC Message-ID, which is what threads a reply.
   readonly messageId: string;
   readonly sender: string;
-  // Set for a message this mailbox wrote: a Sent list shows who it went to, not the sender.
   readonly recipient: string | null;
-  // The first message of the conversation, so replies group under one root.
   readonly threadId: string | null;
   readonly subject: string | null;
   readonly folder: string;
@@ -125,8 +122,6 @@ export interface MessageAttachment {
 export interface MessageDetail extends MessageSummary {
   readonly to: readonly string[];
   readonly cc: readonly string[];
-  // No bcc: a blind copy never travels in the message, so a delivered mail cannot carry one
-  // and there is nothing for the API to report.
   readonly html: string | null;
   readonly text: string | null;
   readonly attachments: readonly MessageAttachment[];
@@ -138,9 +133,7 @@ export interface Folder {
   readonly parent: string | null;
   readonly total: number;
   readonly unread: number;
-  // Owned by the mail server: cannot be renamed or deleted.
   readonly system: boolean;
-  // The IMAP SPECIAL-USE flag, so Archive and Trash are found without matching on a name.
   readonly specialUse: string | null;
   readonly ruleCount: number;
 }

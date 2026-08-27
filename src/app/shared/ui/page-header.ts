@@ -9,8 +9,6 @@ import { Component, input } from '@angular/core';
     >
       <div class="min-w-0">
         @if (eyebrow(); as text) {
-          <!-- A long hint wrapped to three lines of uppercase mono on a phone, pushing the
-               heading down and squeezing the action beside it. One line, always. -->
           <div
             class="stx-mono truncate text-[11px] uppercase tracking-widest"
             [style.color]="'var(--stx-muted-2)'"

@@ -145,7 +145,6 @@
   background: var(--stx-ink);
 }
 
-/* The theme toggle and Sign out, which the top bar has no room for below the breakpoint. */
 .drawer-footer {
   display: none;
   flex-direction: column;
@@ -156,7 +155,6 @@
 }
 
 @media (max-width: 899px) {
-  /* Out of the flow: as a flex:none column it took 208px of a 390px screen. */
   :host {
     position: fixed;
     top: 0;

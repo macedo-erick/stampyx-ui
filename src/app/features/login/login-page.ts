@@ -19,7 +19,6 @@ export class LoginPage {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  // Address first, like the Keycloak screen, and no password field until there is one to attach it to.
   protected readonly step = signal<1 | 2>(1);
   private readonly focusTarget = viewChild<ElementRef<HTMLInputElement>>('focusTarget');
   protected readonly email = signal('');
@@ -28,7 +27,6 @@ export class LoginPage {
   protected readonly busy = signal(false);
   protected readonly failed = signal<string | null>(null);
 
-  // This one serves customer domains too, so the address cannot be a local part with a fixed suffix.
   protected readonly canContinue = computed(() => {
     const at = this.email().trim().lastIndexOf('@');
 
@@ -36,7 +34,6 @@ export class LoginPage {
   });
 
   constructor() {
-    // `autofocus` cannot follow a step change, and the lint rule forbids it anyway.
     effect(() => {
       this.step();
       this.focusTarget()?.nativeElement.focus();
@@ -72,13 +69,11 @@ export class LoginPage {
       },
       error: () => {
         this.busy.set(false);
-        // One message for every failure: the API does not say whether the address exists, nor should this.
         this.failed.set('login.failed');
       },
     });
   }
 
-  // Domain owners registered themselves, so their password lives in Keycloak, not here.
   protected signInWithKeycloak(): void {
     this.auth.login(this.redirectTarget());
   }

@@ -70,7 +70,6 @@ export class DomainDetailPage {
     setTimeout(() => this.copied.set(null), 1500);
   }
 
-  // Report keyed by check name, records by type+host: pairing lets each row carry its own state.
   protected statusOf(record: DnsRecord): CheckStatus | null {
     const checks = this.report()?.checks ?? [];
     const name = checkNameFor(record);
@@ -78,7 +77,6 @@ export class DomainDetailPage {
     return checks.find((check) => check.name === name)?.status ?? null;
   }
 
-  // Reverse DNS is set in the VPS provider's panel, so it has a state but no record to copy.
   protected get ptr(): CheckStatus | null {
     return this.report()?.checks.find((check) => check.name === 'PTR')?.status ?? null;
   }
