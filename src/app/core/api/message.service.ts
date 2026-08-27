@@ -44,14 +44,12 @@ export class MessageService {
     return this.http.post<void>(`${this.base(mailboxId)}/drafts`, body);
   }
 
-  // The whole conversation, bodies included, oldest first - and it marks the message read
-  // on the way. Opening a message is this one call, not a read followed by a thread.
+  // The whole conversation oldest first, marked read on the way: one call, not a read plus a thread.
   thread(mailboxId: string, id: string): Observable<MessageDetail[]> {
     return this.http.get<MessageDetail[]>(`${this.base(mailboxId)}/${id}/thread`);
   }
 
-  // Goes through HttpClient rather than a plain link: the endpoint needs the bearer token,
-  // which an <a href> cannot carry.
+  // Through HttpClient, not a link: the endpoint needs a bearer token an <a href> cannot carry.
   attachment(mailboxId: string, id: string, index: number): Observable<Blob> {
     return this.http.get(
       `${this.base(mailboxId)}/${encodeURIComponent(id)}/attachments/${String(index)}`,

@@ -51,8 +51,7 @@ describe('authGuard', () => {
     expect(activate().result).not.toBe(true);
   });
 
-  // Sending them straight to Keycloak would strand every mailbox user, since an administrator
-  // provisioned them and they have no account to sign in with there.
+  // Keycloak would strand mailbox users: an administrator provisioned them and they have no account there.
   it('offers a signed-out visitor the stampyx form instead of the Keycloak login', () => {
     const { createUrlTree, login } = activate({ url: '/lists/3f1b8b8e' });
 

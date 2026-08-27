@@ -8,12 +8,22 @@
   </main>
 </div>
 
+<ng-container *transloco="let t">
+  <button
+    type="button"
+    class="stx-scrim"
+    [class.is-open]="nav.open()"
+    [attr.aria-label]="t('nav.closeMenu')"
+    [attr.aria-hidden]="nav.open() ? null : 'true'"
+    [attr.tabindex]="nav.open() ? null : -1"
+    (click)="nav.close()"
+  ></button>
+</ng-container>
+
 <p-toast position="bottom-right" />
 
-<!-- ConfirmationService only posts an event; without this rendered, every confirm() was a
-     silent no-op and the delete buttons did nothing. Headless: PrimeNG keeps the mask, the
-     focus trap and Escape, and the panel itself is ours, so a destructive question looks
-     like the rest of the app instead of a stock blue Yes/No. -->
+<!-- ConfirmationService only posts an event: without this rendered, every confirm() was a silent
+     no-op. Headless, so PrimeNG keeps the mask, focus trap and Escape while the panel stays ours. -->
 <p-confirmdialog [style]="{ width: '25rem' }">
   <ng-template #headless let-confirmation let-onAccept="onAccept" let-onReject="onReject">
     <div class="stx-card stx-confirm" *transloco="let t">

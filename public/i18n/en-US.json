@@ -19,7 +19,9 @@
     "settings": "Settings",
     "signOut": "Sign out",
     "admin": "Administration",
-    "manage": "Manage"
+    "manage": "Manage",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "theme": {
     "toDark": "Switch to dark theme",
@@ -35,6 +37,7 @@
     "retry": "Retry",
     "none": "Nothing here yet",
     "reload": "Reload",
+    "close": "Close",
     "confirm": "Confirm",
     "showPassword": "Show password",
     "hidePassword": "Hide password"
@@ -69,12 +72,20 @@
     "emptyBody": "Nothing in this folder yet. New mail shows up here.",
     "archive": "Archive",
     "forward": "Forward",
+    "back": "Back",
+    "formatting": "Formatting",
     "download": "Download {{name}}",
     "toPrefix": "To",
+    "date": "Date",
+    "folder": "Folder",
+    "spamScore": "Spam score",
+    "messageId": "Message-ID",
+    "details": "Message details",
+    "toLine": "to {{names}}",
+    "noRecipients": "no visible recipient",
     "threadCount": "{{count}} messages in this conversation",
     "threadCollapse": "Collapse message",
-    "threadExpand": "Open message",
-    "toLine": "to {{names}}"
+    "threadExpand": "Open message"
   },
   "compose": {
     "title": "New message",
@@ -99,13 +110,19 @@
     "attachmentFailed": "Could not attach {{name}}",
     "saveDraft": "Save draft",
     "draftSaved": "Draft saved to Drafts",
+    "draftDiscarded": "Draft discarded",
+    "discardFailed": "Could not discard the draft",
+    "paragraph": "Normal text",
     "underline": "Underline",
-    "strike": "Strikethrough",
+    "strikethrough": "Strikethrough",
     "bulletList": "Bulleted list",
-    "numberList": "Numbered list",
+    "numberedList": "Numbered list",
     "quote": "Quote",
-    "clearFormat": "Clear formatting",
-    "unlink": "Remove link"
+    "code": "Code block",
+    "alignLeft": "Align left",
+    "alignCenter": "Centre",
+    "alignRight": "Align right",
+    "clearFormatting": "Clear formatting"
   },
   "domains": {
     "title": "Domains & warmup",

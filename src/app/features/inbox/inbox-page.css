@@ -1,0 +1,61 @@
+.back-button,
+.compose-fab {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  /* 208px of sidebar plus 396px of list left nothing for the reader on a 390px phone. */
+  .list-pane {
+    width: 100%;
+    border-right: 0;
+  }
+
+  /* Covers the list. Absolute, not fixed, so the top bar stays put above it. */
+  .reader-pane {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    display: none;
+  }
+
+  .reader-pane.is-open {
+    display: flex;
+  }
+
+  .back-button {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    margin-left: -8px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--stx-radius-pill);
+    background: transparent;
+    color: var(--stx-text);
+    cursor: pointer;
+  }
+
+  .compose-fab {
+    position: absolute;
+    right: 16px;
+    bottom: 28px;
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--stx-radius-pill);
+    background: var(--stx-ink);
+    color: #fff;
+    box-shadow: 0 6px 20px rgb(0 0 0 / 32%);
+    cursor: pointer;
+  }
+
+  .compose-fab.is-hidden {
+    display: none;
+  }
+}

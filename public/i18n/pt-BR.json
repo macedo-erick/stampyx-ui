@@ -19,7 +19,9 @@
     "settings": "Configurações",
     "signOut": "Sair",
     "admin": "Administração",
-    "manage": "Gerenciar"
+    "manage": "Gerenciar",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu"
   },
   "theme": {
     "toDark": "Mudar para tema escuro",
@@ -35,6 +37,7 @@
     "retry": "Tentar de novo",
     "none": "Nada por aqui ainda",
     "reload": "Recarregar",
+    "close": "Fechar",
     "confirm": "Confirmar",
     "showPassword": "Mostrar senha",
     "hidePassword": "Ocultar senha"
@@ -69,12 +72,20 @@
     "emptyBody": "Nada nesta pasta ainda. Quando chegar mensagem, ela aparece aqui.",
     "archive": "Arquivar",
     "forward": "Encaminhar",
+    "back": "Voltar",
+    "formatting": "Formatação",
     "download": "Baixar {{name}}",
     "toPrefix": "Para",
+    "date": "Data",
+    "folder": "Pasta",
+    "spamScore": "Pontuação de spam",
+    "messageId": "Message-ID",
+    "details": "Detalhes da mensagem",
+    "toLine": "para {{names}}",
+    "noRecipients": "sem destinatário visível",
     "threadCount": "{{count}} mensagens nesta conversa",
     "threadCollapse": "Recolher mensagem",
-    "threadExpand": "Abrir mensagem",
-    "toLine": "para {{names}}"
+    "threadExpand": "Abrir mensagem"
   },
   "compose": {
     "title": "Nova mensagem",
@@ -99,13 +110,19 @@
     "attachmentFailed": "Não foi possível anexar {{name}}",
     "saveDraft": "Salvar rascunho",
     "draftSaved": "Rascunho salvo em Rascunhos",
+    "draftDiscarded": "Rascunho descartado",
+    "discardFailed": "Não foi possível descartar o rascunho",
+    "paragraph": "Texto normal",
     "underline": "Sublinhado",
-    "strike": "Tachado",
+    "strikethrough": "Tachado",
     "bulletList": "Lista com marcadores",
-    "numberList": "Lista numerada",
+    "numberedList": "Lista numerada",
     "quote": "Citação",
-    "clearFormat": "Limpar formatação",
-    "unlink": "Remover link"
+    "code": "Bloco de código",
+    "alignLeft": "Alinhar à esquerda",
+    "alignCenter": "Centralizar",
+    "alignRight": "Alinhar à direita",
+    "clearFormatting": "Limpar formatação"
   },
   "domains": {
     "title": "Domínios e warmup",

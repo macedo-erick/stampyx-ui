@@ -3,18 +3,25 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 
 import { MeService } from '../core/api/me.service';
+import { AuthService } from '../core/auth/auth.service';
 import { MailboxContext } from '../core/mailbox-context.service';
+import { ThemeService } from '../core/theme.service';
 import type { Folder } from '../shared/models';
+import { MobileNav } from './mobile-nav.service';
 
 @Component({
   selector: 'stampyx-sidebar',
   imports: [TranslocoDirective, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
+  host: { '[class.is-open]': 'nav.open()' },
 })
 export class Sidebar {
   protected readonly context = inject(MailboxContext);
   protected readonly me = inject(MeService);
+  protected readonly theme = inject(ThemeService);
+  protected readonly auth = inject(AuthService);
+  protected readonly nav = inject(MobileNav);
   private readonly router = inject(Router);
 
   protected readonly systemFolders = computed(() =>
@@ -34,15 +41,13 @@ export class Sidebar {
     void this.router.navigate(['/inbox'], { queryParams: { compose: 1 } });
   }
 
-  // In the URL, not only in memory: otherwise a reload always lands back in INBOX and a
-  // folder cannot be linked to.
+  // In the URL, not just memory: otherwise a reload lands in INBOX and no folder can be linked.
   protected openFolder(folder: Folder): void {
     void this.router.navigate(['/inbox'], { queryParams: { folder: folder.path } });
   }
 
-  // A badge answers "is there anything for me here", which is unread mail - the total was
-  // just telling you how much the folder holds. Drafts is the exception: a draft is never
-  // unread, and what matters is how many are still waiting to be finished.
+  // A badge means unread, not how much the folder holds. Drafts is the exception: a draft is
+  // never unread, so it counts what is still unfinished.
   protected badge(folder: Folder): number {
     return folder.specialUse === '\\Drafts' ? folder.total : folder.unread;
   }
@@ -70,8 +75,7 @@ export class Sidebar {
   }
 }
 
-// Dovecot's own folders in the order a reader expects. Alphabetical would bury Sent under
-// a custom "Arquivo".
+// Dovecot's folders in reading order; alphabetical would bury Sent under a custom "Arquivo".
 const ORDER = ['inbox', 'sent', 'drafts', 'junk', 'spam', 'trash', 'archive'];
 
 function rank(folder: Folder): number {

@@ -1,6 +1,5 @@
-/* Anchored bottom-right so the message list stays usable while writing. Colours come from
-   the app tokens so it follows the theme; only the radii are local, because the panel is
-   the first screen to adopt the 14 / 8 / 999 scale. */
+/* Anchored bottom-right so the list stays usable while writing. Colours are app tokens; only
+   the radii are local, this being the first screen on the 14 / 8 / 999 scale. */
 :host {
   position: absolute;
   right: 26px;
@@ -181,80 +180,10 @@
   cursor: pointer;
 }
 
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  padding: 7px 13px;
-  border-bottom: 1px solid var(--stx-surface-2);
-  color: var(--stx-muted);
-}
-
-.toolbar button {
-  display: grid;
-  place-items: center;
-  width: 27px;
-  height: 27px;
-  padding: 0;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-}
-
-.toolbar button:hover {
-  background: var(--stx-surface-2);
-  color: var(--stx-text);
-}
-
-.toolbar button.is-active {
-  background: var(--stx-ink);
-  color: #fff;
-}
-
-.toolbar-split {
-  width: 1px;
-  height: 16px;
-  margin: 0 4px;
-  background: var(--stx-line);
-}
-
-/* The body is written here and read in someone else's client, so it gets the same shape a
-   mail client gives it rather than the page's own defaults. */
-.body ul,
-.body ol {
-  margin: 6px 0;
-  padding-left: 22px;
-  list-style: revert;
-}
-
-.body blockquote {
-  margin: 8px 0;
-  padding-left: 12px;
-  border-left: 2px solid var(--stx-line-strong);
-  color: var(--stx-muted);
-}
-
-.body a {
-  color: var(--stx-ink);
-  text-decoration: underline;
-}
-
 .body {
+  display: block;
   min-height: 132px;
-  max-height: 260px;
-  overflow-y: auto;
-  padding: 15px 16px;
-  font-size: 13px;
-  line-height: 1.65;
-  color: var(--stx-text);
-  outline: none;
-}
-
-.body:empty::before {
-  content: attr(data-placeholder);
-  color: var(--stx-muted-2);
+  border-bottom: 1px solid var(--stx-surface-2);
 }
 
 .attachments {
@@ -400,9 +329,57 @@
 }
 
 :host(.is-minimized) .row,
-:host(.is-minimized) .toolbar,
 :host(.is-minimized) .body,
 :host(.is-minimized) .attachments,
 :host(.is-minimized) .foot {
   display: none;
+}
+
+.format-toggle {
+  display: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--stx-radius-pill);
+  background: transparent;
+  color: var(--stx-muted);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.format-toggle.is-on {
+  background: var(--stx-ink);
+  color: #fff;
+}
+
+/* A 476px corner drawer has nowhere to go on a phone. */
+@media (max-width: 899px) {
+  :host {
+    position: fixed;
+    inset: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 70;
+    width: 100%;
+    max-width: none;
+    border: 0;
+    border-radius: 0;
+  }
+
+  :host(.is-minimized) {
+    inset: auto 0 0 0;
+    height: auto;
+  }
+
+  .format-toggle {
+    display: grid;
+  }
+
+  .foot {
+    padding-bottom: 26px;
+  }
 }

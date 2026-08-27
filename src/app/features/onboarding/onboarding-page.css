@@ -1,5 +1,4 @@
-/* Same shapes as the sign-in screen: picking an address is the last step of signing up, so
-   it should not look like a different product. */
+/* Same shapes as the sign-in screen: picking an address is the last step of signing up. */
 :host {
   --stx-bg: #f1efe8;
   --stx-surface: #ffffff;
@@ -236,8 +235,8 @@
   font-size: 0.95rem;
 }
 
-/* Verbatim from the theme. Without the !important the `:focus-visible` rule further down
-   wins on equal specificity and paints a second ring inside the affix's own focus border. */
+/* Verbatim from the theme. Without !important, `:focus-visible` below ties on specificity
+   and paints a second ring inside the affix's focus border. */
 .stx-input,
 .stx-affix input {
   border: 0 !important;

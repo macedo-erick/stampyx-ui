@@ -5,14 +5,16 @@
 @import 'tailwindcss/utilities.css' layer(utilities);
 @import 'primeicons/primeicons.css';
 
+/* PrimeNG's p-editor is a Quill wrapper and ships no theme of its own. Snow is the toolbar
+   and, more to the point, the link tooltip. Global rather than component-scoped: Quill builds
+   its DOM at runtime, so Angular's emulated encapsulation attributes never reach it. */
+@import 'quill/dist/quill.snow.css';
+
 @plugin 'tailwindcss-primeui';
 @custom-variant dark (&:where(.app-dark, .app-dark *));
 
-/*
- * The mockup palette is the brand; PrimeNG's Aura variables are the system. Rather than
- * out-specifying Aura, its own custom properties are redefined here, so every component
- * keeps computing hover, focus and disabled states from these values.
- */
+/* The mockup palette is the brand, Aura is the system. Redefining Aura's own custom properties
+   rather than out-specifying them keeps every component computing its states from these values. */
 :root {
   --stx-ink: #2d6f8a;
   --stx-ink-text: #215b76;
@@ -32,8 +34,7 @@
 
   --stx-line-strong: #c7c0ad;
 
-  /* Three steps, not one: cards, fields and pills. The single 3px value was what made the
-     panel read as square next to the sign-in screen. */
+  /* Three steps, not one: cards, fields and pills. A single 3px read as square next to sign-in. */
   --stx-radius: 14px;
   --stx-radius-sm: 8px;
   --stx-radius-pill: 999px;
@@ -67,8 +68,7 @@
   --p-primary-hover-color: var(--stx-ink-text);
   --p-content-background: var(--stx-surface);
   --p-content-border-color: var(--stx-line);
-  /* Most PrimeNG surfaces here are fields and menus, so they take the field radius; the
-     page's own cards use --stx-radius directly. */
+  /* Fields and menus take the field radius; the page's own cards use --stx-radius directly. */
   --p-content-border-radius: var(--stx-radius-sm);
   --p-border-radius-sm: var(--stx-radius-sm);
   --p-border-radius-md: var(--stx-radius-sm);
@@ -93,9 +93,8 @@ body {
   font-size: 14px;
 }
 
-/* The browser's own scrollbar is a wide light rail that ignores the theme, and it shows up
-   in the middle of every panel: the message list, the reading pane, the folder tree. Styled
-   once here so every scrolling area in the app looks the same. */
+/* The browser's own rail ignores the theme and shows up mid-panel everywhere, so it is styled
+   once here for every scrolling area. */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--stx-line-strong) transparent;
@@ -111,8 +110,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  /* The border is what insets the thumb: padding-box keeps the background off it, so the
-     bar reads as a narrow pill with room around it rather than a rail filling the gutter. */
+  /* The border insets the thumb and padding-box keeps the background off it, so it reads as a pill. */
   border: 3px solid transparent;
   border-radius: var(--stx-radius-pill);
   background: var(--stx-line-strong);
@@ -128,8 +126,7 @@ body {
   background: transparent;
 }
 
-/* Headless confirm dialog. PrimeNG still draws the panel it puts the template in, so it is
-   flattened here - otherwise the card inside sits in a second frame. */
+/* Headless confirm dialog: PrimeNG still draws its own panel, flattened here so the card is not framed twice. */
 /* Both classes, so it outranks .p-dialog no matter which stylesheet the theme lands in. */
 .p-dialog.p-confirmdialog {
   background: transparent;
@@ -342,4 +339,326 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--stx-muted-2);
+}
+
+/* Preflight strips the defaults off every heading, list and quote, which is right for the
+   panel's own chrome and wrong for mail: a message writes its own markup and the composer
+   now produces it. Scoped to the two places that render a message body. */
+.stx-prose h1,
+.stx-prose h2,
+.stx-prose h3 {
+  margin: 1.1em 0 0.45em;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.stx-prose h1 {
+  font-size: 1.5em;
+}
+
+.stx-prose h2 {
+  font-size: 1.28em;
+}
+
+.stx-prose h3 {
+  font-size: 1.1em;
+}
+
+.stx-prose p,
+.stx-prose blockquote,
+.stx-prose pre,
+.stx-prose ul,
+.stx-prose ol {
+  margin: 0.6em 0;
+}
+
+.stx-prose :first-child {
+  margin-top: 0;
+}
+
+.stx-prose :last-child {
+  margin-bottom: 0;
+}
+
+.stx-prose ul,
+.stx-prose ol {
+  padding-left: 1.5em;
+}
+
+.stx-prose ul {
+  list-style: disc;
+}
+
+.stx-prose ol {
+  list-style: decimal;
+}
+
+.stx-prose li {
+  margin: 0.2em 0;
+}
+
+.stx-prose blockquote {
+  padding-left: 0.9em;
+  border-left: 3px solid var(--stx-line);
+  color: var(--stx-muted);
+}
+
+.stx-prose pre {
+  padding: 0.7em 0.9em;
+  border-radius: 10px;
+  background: var(--stx-surface-2);
+  font-family: var(--stx-mono);
+  font-size: 0.92em;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.stx-prose a {
+  color: var(--stx-ink);
+  text-decoration: underline;
+}
+
+.stx-prose img {
+  max-width: 100%;
+  height: auto;
+}
+
+.stx-prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+/* Quill in the panel's clothes. Its own chrome is a light-themed 2017 default; these pull it
+   onto the app tokens so it follows the theme switch like everything else. */
+.ql-toolbar.ql-snow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  border: 0;
+  border-bottom: 1px solid var(--stx-surface-2);
+  font-family: inherit;
+}
+
+.ql-container.ql-snow {
+  border: 0;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.ql-snow .ql-editor {
+  padding: 15px 16px;
+  line-height: 1.65;
+  color: var(--stx-text);
+}
+
+.ql-snow .ql-editor.ql-blank::before {
+  left: 16px;
+  right: 16px;
+  color: var(--stx-muted-2);
+  font-style: normal;
+}
+
+/* Quill draws its icons as strokes and fills on inline SVG, hard-coded to near-black. In
+   dark mode that is an invisible toolbar. */
+.ql-snow .ql-stroke {
+  stroke: var(--stx-muted);
+}
+
+.ql-snow .ql-fill,
+.ql-snow .ql-stroke.ql-fill {
+  fill: var(--stx-muted);
+}
+
+.ql-snow .ql-picker {
+  color: var(--stx-muted);
+}
+
+.ql-snow button:hover .ql-stroke,
+.ql-snow button:focus .ql-stroke,
+.ql-snow button.ql-active .ql-stroke,
+.ql-snow .ql-picker-label:hover .ql-stroke,
+.ql-snow .ql-picker-label.ql-active .ql-stroke {
+  stroke: var(--stx-ink);
+}
+
+.ql-snow button:hover .ql-fill,
+.ql-snow button:focus .ql-fill,
+.ql-snow button.ql-active .ql-fill {
+  fill: var(--stx-ink);
+}
+
+.ql-snow button {
+  border-radius: 8px;
+}
+
+.ql-snow button:hover,
+.ql-snow button.ql-active {
+  background: var(--stx-surface-2);
+}
+
+.ql-snow .ql-picker-options {
+  background: var(--stx-surface);
+  border-color: var(--stx-line);
+  border-radius: 10px;
+}
+
+/* The link editor. This is the whole reason the panel moved off window.prompt, so it has to
+   be legible in both themes rather than the theme Quill assumed. */
+.ql-snow .ql-tooltip {
+  z-index: 50;
+  padding: 7px 9px;
+  border: 1px solid var(--stx-line);
+  border-radius: 10px;
+  background: var(--stx-surface);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 22%);
+  color: var(--stx-text);
+}
+
+.ql-snow .ql-tooltip input[type='text'] {
+  padding: 4px 7px;
+  border: 1px solid var(--stx-line);
+  border-radius: 7px;
+  background: var(--stx-bg);
+  color: var(--stx-text);
+  font-family: var(--stx-mono);
+  font-size: 12px;
+}
+
+.ql-snow .ql-tooltip a {
+  color: var(--stx-ink);
+}
+
+/* Quill zeroes the margins on every block so its own editor stays compact, which leaves
+   headings and lists indistinguishable from body text while you are writing them. */
+.ql-snow .ql-editor h1,
+.ql-snow .ql-editor h2,
+.ql-snow .ql-editor h3 {
+  margin: 1.1em 0 0.45em;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.ql-snow .ql-editor h1 {
+  font-size: 1.5em;
+}
+
+.ql-snow .ql-editor h2 {
+  font-size: 1.28em;
+}
+
+.ql-snow .ql-editor h3 {
+  font-size: 1.1em;
+}
+
+.ql-snow .ql-editor blockquote {
+  margin: 0.6em 0;
+  padding-left: 0.9em;
+  border-left: 3px solid var(--stx-line);
+  color: var(--stx-muted);
+}
+
+.ql-snow .ql-editor a {
+  color: var(--stx-ink);
+  text-decoration: underline;
+}
+
+.ql-snow .ql-editor > :first-child {
+  margin-top: 0;
+}
+
+/* Backs the sidebar when it is a drawer. */
+.stx-scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  padding: 0;
+  border: 0;
+  background: rgb(0 0 0 / 55%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+  cursor: pointer;
+}
+
+@media (max-width: 899px) {
+  .stx-scrim {
+    display: block;
+  }
+
+  .stx-scrim.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Global because Quill builds its toolbar at runtime, out of reach of component styles. */
+@media (max-width: 899px) {
+  .stx-compose .p-editor .p-editor-toolbar,
+  .stx-compose .p-editor .ql-toolbar {
+    display: none;
+  }
+
+  .stx-compose.is-formatting .p-editor .p-editor-toolbar,
+  .stx-compose.is-formatting .p-editor .ql-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: 6px 8px;
+  }
+
+  .stx-compose.is-formatting .p-editor .ql-toolbar button,
+  .stx-compose.is-formatting .p-editor .ql-toolbar .ql-picker-label,
+  .stx-compose.is-formatting .p-editor .p-editor-toolbar button {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* The template pins the content to 160px inline; only !important reaches that. */
+  .stx-compose .p-editor.body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .stx-compose .p-editor .p-editor-content {
+    height: auto !important;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .stx-compose .p-editor .ql-container {
+    height: 100%;
+  }
+}
+
+/* Unlayered, so these win over the Tailwind utilities in the templates. */
+@media (max-width: 899px) {
+  .stx-split {
+    flex-direction: column;
+  }
+
+  .stx-split > * {
+    width: 100%;
+    max-width: none;
+  }
+
+  .stx-field-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .stx-page-body {
+    padding: 16px;
+  }
+
+  .stx-page-head {
+    padding: 12px 16px;
+  }
 }
