@@ -1,7 +1,7 @@
 <ng-container *transloco="let t">
   <div class="flex min-h-0 flex-1">
     <section
-      class="flex w-[396px] shrink-0 flex-col border-r"
+      class="list-pane flex w-[396px] shrink-0 flex-col border-r"
       [style.borderColor]="'var(--stx-line)'"
       [attr.aria-label]="t('nav.inbox')"
     >
@@ -118,7 +118,11 @@
       </div>
     </section>
 
-    <section class="flex min-w-0 flex-1 flex-col" [style.background]="'var(--stx-bg)'">
+    <section
+      class="reader-pane flex min-w-0 flex-1 flex-col"
+      [class.is-open]="selected() !== null"
+      [style.background]="'var(--stx-bg)'"
+    >
       @if (selected(); as message) {
         <div
           class="flex shrink-0 items-center justify-between gap-3 border-b px-5 py-3"
@@ -126,6 +130,29 @@
           [style.background]="'var(--stx-surface)'"
         >
           <div class="flex items-center gap-2">
+            <!-- The way back to the list once the reader covers it; laid out only under the
+                 breakpoint, where the two panes stop being side by side. -->
+            <button
+              type="button"
+              class="back-button"
+              (click)="closeMessage()"
+              [attr.aria-label]="t('inbox.back')"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M15 18l-6-6 6-6"></path>
+              </svg>
+            </button>
+
             <button type="button" class="stx-pill stx-pill--quiet" (click)="startReply(message)">
               <svg
                 viewBox="0 0 24 24"
@@ -400,6 +427,30 @@
       }
     </section>
   </div>
+
+  <!-- Compose leaves the drawer under the breakpoint: burying the panel's primary action
+       behind a hamburger would be a downgrade, so it becomes a FAB on the list instead.
+       Hidden while a message or the composer is open, where it would sit over the content. -->
+  <button
+    type="button"
+    class="compose-fab"
+    [class.is-hidden]="selected() !== null || composeOpen()"
+    (click)="startCompose()"
+    [attr.aria-label]="t('inbox.compose')"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      width="24"
+      height="24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.4"
+      stroke-linecap="round"
+      aria-hidden="true"
+    >
+      <path d="M12 5v14M5 12h14"></path>
+    </svg>
+  </button>
 
   @if (composeOpen() && mailboxId(); as id) {
     <stampyx-compose-panel

@@ -8,6 +8,21 @@
   </main>
 </div>
 
+<!-- Only ever visible under the mobile breakpoint, where the sidebar is a drawer over the
+     content rather than a column beside it. A button so it is dismissable from the keyboard
+     as well as by tapping outside. -->
+<ng-container *transloco="let t">
+  <button
+    type="button"
+    class="stx-scrim"
+    [class.is-open]="nav.open()"
+    [attr.aria-label]="t('nav.closeMenu')"
+    [attr.aria-hidden]="nav.open() ? null : 'true'"
+    [attr.tabindex]="nav.open() ? null : -1"
+    (click)="nav.close()"
+  ></button>
+</ng-container>
+
 <p-toast position="bottom-right" />
 
 <!-- ConfirmationService only posts an event: without this rendered, every confirm() was a silent

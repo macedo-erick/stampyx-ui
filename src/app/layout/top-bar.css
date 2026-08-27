@@ -100,3 +100,78 @@
   font-size: 12px;
   font-weight: 700;
 }
+
+.hamburger,
+.search-open,
+.search-close {
+  display: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--stx-radius-pill);
+  background: transparent;
+  color: var(--stx-muted);
+  cursor: pointer;
+}
+
+.hamburger:hover,
+.search-open:hover,
+.search-close:hover {
+  color: var(--stx-text);
+}
+
+/* One panel at a time. Above this the shell keeps its three columns; below it the sidebar
+   becomes an overlay drawer, so the bar has to grow a button that opens it. */
+@media (max-width: 899px) {
+  :host {
+    gap: 4px;
+    padding: 0 8px 0 4px;
+  }
+
+  .hamburger,
+  .search-open {
+    display: grid;
+  }
+
+  /* The field is what pushed the actions off-screen at 390px, so it is an icon until asked
+     for, and takes the whole bar once it is. */
+  .search {
+    display: none;
+  }
+
+  .search.is-open {
+    display: flex;
+    flex: 1;
+    max-width: none;
+    padding-right: 4px;
+  }
+
+  .search-close {
+    display: grid;
+    width: 36px;
+    height: 36px;
+  }
+
+  .is-hidden {
+    display: none;
+  }
+
+  /* Both live in the drawer's footer down here, where there is room for a label. */
+  .desktop-only {
+    display: none;
+  }
+
+  .icon-button,
+  .avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* The open field takes the bar; the brand cannot be reached from it with a sibling
+     selector, so the host carries the state instead. */
+  :host(.is-searching) .brand {
+    display: none;
+  }
+}

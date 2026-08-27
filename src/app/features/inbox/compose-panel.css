@@ -334,3 +334,52 @@
 :host(.is-minimized) .foot {
   display: none;
 }
+
+.format-toggle {
+  display: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--stx-radius-pill);
+  background: transparent;
+  color: var(--stx-muted);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.format-toggle.is-on {
+  background: var(--stx-ink);
+  color: #fff;
+}
+
+/* A 476px drawer pinned to a corner has nowhere to go on a phone, so it takes the screen. */
+@media (max-width: 899px) {
+  :host {
+    position: fixed;
+    inset: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 70;
+    width: 100%;
+    max-width: none;
+    border: 0;
+    border-radius: 0;
+  }
+
+  :host(.is-minimized) {
+    inset: auto 0 0 0;
+    height: auto;
+  }
+
+  .format-toggle {
+    display: grid;
+  }
+
+  .foot {
+    padding-bottom: 26px;
+  }
+}

@@ -17,6 +17,7 @@ import { ComposePanel, type ComposeSeed } from './compose-panel';
   selector: 'stampyx-inbox-page',
   imports: [TranslocoDirective, EmptyState, ComposePanel],
   templateUrl: './inbox-page.html',
+  styleUrl: './inbox-page.css',
   // relative, so the composer can anchor itself to the bottom-right of the page
   host: { class: 'relative flex flex-1 flex-col overflow-hidden' },
 })
@@ -314,6 +315,18 @@ export class InboxPage {
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });
+  }
+
+  // Under the layout's breakpoint the reader covers the list rather than sitting beside it,
+  // so closing the message is how you get back to the list. Above it this is a no-op the
+  // template never offers.
+  protected closeMessage(): void {
+    this.clearSelection();
+  }
+
+  protected startCompose(): void {
+    this.seed.set(null);
+    this.composeOpen.set(true);
   }
 
   private clearSelection(): void {

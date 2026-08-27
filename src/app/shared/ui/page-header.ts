@@ -4,7 +4,7 @@ import { Component, input } from '@angular/core';
   selector: 'stampyx-page-header',
   template: `
     <header
-      class="flex shrink-0 items-center justify-between gap-4 border-b px-6 py-4"
+      class="stx-page-head flex shrink-0 items-center justify-between gap-4 border-b px-6 py-4"
       [style.borderColor]="'var(--stx-line)'"
     >
       <div class="min-w-0">

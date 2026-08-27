@@ -17,8 +17,8 @@
     </button>
   </stampyx-page-header>
 
-  <div class="min-h-0 flex-1 overflow-auto p-6">
-    <div class="mx-auto flex max-w-6xl gap-6">
+  <div class="stx-page-body min-h-0 flex-1 overflow-auto p-6">
+    <div class="stx-split mx-auto flex max-w-6xl gap-6">
       <div class="flex w-[396px] shrink-0 flex-col gap-2">
         @if (items().length === 0) {
           <stampyx-empty-state [heading]="t('rules.empty')" [body]="t('rules.emptyBody')" />

@@ -3,18 +3,25 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 
 import { MeService } from '../core/api/me.service';
+import { AuthService } from '../core/auth/auth.service';
 import { MailboxContext } from '../core/mailbox-context.service';
+import { ThemeService } from '../core/theme.service';
 import type { Folder } from '../shared/models';
+import { MobileNav } from './mobile-nav.service';
 
 @Component({
   selector: 'stampyx-sidebar',
   imports: [TranslocoDirective, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
+  host: { '[class.is-open]': 'nav.open()' },
 })
 export class Sidebar {
   protected readonly context = inject(MailboxContext);
   protected readonly me = inject(MeService);
+  protected readonly theme = inject(ThemeService);
+  protected readonly auth = inject(AuthService);
+  protected readonly nav = inject(MobileNav);
   private readonly router = inject(Router);
 
   protected readonly systemFolders = computed(() =>

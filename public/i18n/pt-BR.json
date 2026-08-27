@@ -19,7 +19,9 @@
     "settings": "Configurações",
     "signOut": "Sair",
     "admin": "Administração",
-    "manage": "Gerenciar"
+    "manage": "Gerenciar",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu"
   },
   "theme": {
     "toDark": "Mudar para tema escuro",
@@ -35,6 +37,7 @@
     "retry": "Tentar de novo",
     "none": "Nada por aqui ainda",
     "reload": "Recarregar",
+    "close": "Fechar",
     "confirm": "Confirmar",
     "showPassword": "Mostrar senha",
     "hidePassword": "Ocultar senha"
@@ -69,6 +72,8 @@
     "emptyBody": "Nada nesta pasta ainda. Quando chegar mensagem, ela aparece aqui.",
     "archive": "Arquivar",
     "forward": "Encaminhar",
+    "back": "Voltar",
+    "formatting": "Formatação",
     "download": "Baixar {{name}}",
     "toPrefix": "Para",
     "date": "Data",

@@ -1,4 +1,25 @@
 <ng-container *transloco="let t">
+  <button
+    type="button"
+    class="hamburger"
+    (click)="nav.toggle()"
+    [attr.aria-label]="t('nav.openMenu')"
+    [attr.aria-expanded]="nav.open()"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      width="21"
+      height="21"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.9"
+      stroke-linecap="round"
+      aria-hidden="true"
+    >
+      <path d="M4 7h16M4 12h16M4 17h16"></path>
+    </svg>
+  </button>
+
   <a class="brand" routerLink="/inbox">
     <span class="brand-mark" aria-hidden="true">
       <svg
@@ -18,7 +39,9 @@
     Stampyx
   </a>
 
-  <label class="search">
+  <!-- Under the breakpoint this collapses to the icon button below: at 390px a flex:1 field
+       pushed the actions clean off the right edge. -->
+  <label class="search" [class.is-open]="searchOpen()">
     <svg
       viewBox="0 0 24 24"
       width="15"
@@ -37,12 +60,53 @@
       [attr.placeholder]="t('inbox.search')"
       [attr.aria-label]="t('inbox.search')"
     />
-  </label>
-
-  <div class="actions">
     <button
       type="button"
-      class="icon-button"
+      class="search-close"
+      (click)="searchOpen.set(false)"
+      [attr.aria-label]="t('common.close')"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.1"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M18 6 6 18M6 6l12 12"></path>
+      </svg>
+    </button>
+  </label>
+
+  <button
+    type="button"
+    class="search-open"
+    [class.is-hidden]="searchOpen()"
+    (click)="searchOpen.set(true)"
+    [attr.aria-label]="t('inbox.search')"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      width="19"
+      height="19"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      aria-hidden="true"
+    >
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m20 20-3.5-3.5"></path>
+    </svg>
+  </button>
+
+  <div class="actions" [class.is-hidden]="searchOpen()">
+    <button
+      type="button"
+      class="icon-button desktop-only"
       (click)="theme.toggle()"
       [attr.aria-label]="t(theme.isDark() ? 'theme.toLight' : 'theme.toDark')"
     >
@@ -69,7 +133,7 @@
 
     <button
       type="button"
-      class="icon-button"
+      class="icon-button desktop-only"
       (click)="auth.logout()"
       [attr.aria-label]="t('nav.signOut')"
     >
