@@ -2,6 +2,7 @@
   <div class="flex min-h-0 flex-1">
     <section
       class="list-pane flex w-[396px] shrink-0 flex-col border-r"
+      [class.is-selecting]="selecting()"
       [style.borderColor]="'var(--stx-line)'"
       [attr.aria-label]="t('nav.inbox')"
     >
@@ -9,45 +10,137 @@
         class="flex shrink-0 items-center justify-between gap-3 border-b px-4 py-3"
         [style.borderColor]="'var(--stx-line)'"
       >
-        <div class="flex gap-1.5">
-          @for (option of ['all', 'unread']; track option) {
+        @if (selecting()) {
+          <div class="flex min-w-0 items-center gap-2.5">
+            <input
+              type="checkbox"
+              class="stx-check"
+              [checked]="allChecked()"
+              [indeterminate]="someChecked()"
+              (change)="toggleAll()"
+              [attr.aria-label]="t('inbox.selectAll')"
+            />
+            <span class="truncate text-[12px]" [style.color]="'var(--stx-muted)'">{{
+              t('inbox.selectedCount', { count: checkedCount() })
+            }}</span>
+          </div>
+
+          <div class="bulk-actions flex shrink-0 items-center gap-0.5">
+            @if (canFlag()) {
+              <button
+                type="button"
+                class="bulk-button"
+                (click)="markRead(checkedIds(), true)"
+                [attr.aria-label]="t('inbox.markRead')"
+                [attr.title]="t('inbox.markRead')"
+              >
+                <ng-container *ngTemplateOutlet="iconRead"></ng-container>
+              </button>
+              <button
+                type="button"
+                class="bulk-button"
+                (click)="markRead(checkedIds(), false)"
+                [attr.aria-label]="t('inbox.markUnread')"
+                [attr.title]="t('inbox.markUnread')"
+              >
+                <ng-container *ngTemplateOutlet="iconUnread"></ng-container>
+              </button>
+            }
+            @if (canArchive()) {
+              <button
+                type="button"
+                class="bulk-button"
+                (click)="archiveIds(checkedIds())"
+                [attr.aria-label]="t('inbox.archive')"
+                [attr.title]="t('inbox.archive')"
+              >
+                <ng-container *ngTemplateOutlet="iconArchive"></ng-container>
+              </button>
+            }
+            @if (canRestore()) {
+              <button
+                type="button"
+                class="bulk-button"
+                (click)="restoreIds(checkedIds())"
+                [attr.aria-label]="t(restoreLabel())"
+                [attr.title]="t(restoreLabel())"
+              >
+                <ng-container *ngTemplateOutlet="iconRestore"></ng-container>
+              </button>
+            }
             <button
               type="button"
-              class="rounded-full px-3 py-1 text-[11.5px]"
-              [style.background]="filter() === option ? 'var(--stx-surface-2)' : 'transparent'"
-              [style.color]="filter() === option ? 'var(--stx-text)' : 'var(--stx-muted)'"
-              [style.fontWeight]="filter() === option ? 600 : 400"
-              (click)="filter.set($any(option))"
+              class="bulk-button"
+              (click)="removeIds(checkedIds())"
+              [attr.aria-label]="t(deleteLabel())"
+              [attr.title]="t(deleteLabel())"
             >
-              {{ t('inbox.filter.' + option) }}
+              <ng-container *ngTemplateOutlet="iconTrash"></ng-container>
             </button>
-          }
-        </div>
-        <button
-          type="button"
-          class="grid h-7 w-7 place-items-center rounded-full"
-          [style.color]="'var(--stx-muted)'"
-          (click)="refresh()"
-          [attr.aria-label]="t('common.reload')"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="15"
-            height="15"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.9"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            <span class="bulk-divider"></span>
+            <button
+              type="button"
+              class="bulk-button"
+              (click)="clearChecked()"
+              [attr.aria-label]="t('inbox.clearSelection')"
+              [attr.title]="t('inbox.clearSelection')"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M18 6 6 18M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        } @else {
+          <div class="flex gap-1.5">
+            @for (option of ['all', 'unread']; track option) {
+              <button
+                type="button"
+                class="rounded-full px-3 py-1 text-[11.5px]"
+                [style.background]="filter() === option ? 'var(--stx-surface-2)' : 'transparent'"
+                [style.color]="filter() === option ? 'var(--stx-text)' : 'var(--stx-muted)'"
+                [style.fontWeight]="filter() === option ? 600 : 400"
+                (click)="filter.set($any(option))"
+              >
+                {{ t('inbox.filter.' + option) }}
+              </button>
+            }
+          </div>
+          <button
+            type="button"
+            class="grid h-7 w-7 place-items-center rounded-full"
+            [style.color]="'var(--stx-muted)'"
+            (click)="refresh()"
+            [attr.aria-label]="t('common.reload')"
           >
-            <path
-              d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"
-            ></path>
-          </svg>
-        </button>
+            <svg
+              viewBox="0 0 24 24"
+              width="15"
+              height="15"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"
+              ></path>
+            </svg>
+          </button>
+        }
       </div>
 
-      <div class="min-h-0 flex-1 overflow-auto">
+      <div class="min-h-0 flex-1 overflow-auto" (scroll)="pressEnd(); closeMenu()">
         @if (loading()) {
           <p class="p-6 text-center text-sm" [style.color]="'var(--stx-muted-2)'">
             {{ t('common.loading') }}
@@ -59,59 +152,78 @@
             <div class="stx-eyebrow px-4 pt-3 pb-1.5">{{ dayLabel(group.key) }}</div>
 
             @for (row of group.rows; track row.id) {
-              <button
-                type="button"
-                class="flex w-full gap-3 border-b px-4 py-3 text-left"
+              <div
+                class="row-shell flex w-full border-b"
+                [class.is-open]="selected()?.id === row.id"
+                [class.is-checked]="isChecked(row.id)"
                 [style.borderColor]="'var(--stx-surface-2)'"
-                [style.background]="
-                  selected()?.id === row.id ? 'var(--stx-surface-2)' : 'transparent'
-                "
                 [style.borderLeft]="row.read ? '2px solid transparent' : '2px solid var(--stx-ink)'"
-                (click)="open(row)"
+                (contextmenu)="openMenu($event, row)"
+                (pointerdown)="pressStart($event, row)"
+                (pointerup)="pressEnd()"
+                (pointercancel)="pressEnd()"
               >
-                <span
-                  class="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[12px] font-bold"
-                  [style.background]="row.read ? 'var(--stx-surface-2)' : 'var(--stx-ink)'"
-                  [style.color]="row.read ? 'var(--stx-muted)' : '#fff'"
-                  aria-hidden="true"
-                  >{{ initials(displayName(row)) }}</span
-                >
+                <label class="row-check">
+                  <input
+                    type="checkbox"
+                    class="stx-check"
+                    [checked]="isChecked(row.id)"
+                    (click)="onCheck($event, row)"
+                    [attr.aria-label]="t('inbox.selectRow', { name: displayName(row) })"
+                  />
+                </label>
 
-                <span class="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span class="flex items-baseline justify-between gap-2">
-                    <span class="truncate text-[13px]" [style.fontWeight]="row.read ? 400 : 700">
-                      @if (showsRecipient()) {
-                        <span [style.color]="'var(--stx-muted-2)'">{{ t('inbox.toPrefix') }}</span>
-                      }
-                      {{ displayName(row) }}
-                    </span>
-                    <span
-                      class="stx-mono shrink-0 text-[10.5px]"
-                      [style.color]="'var(--stx-muted-2)'"
-                      >{{ time(row.receivedAt) }}</span
-                    >
-                  </span>
+                <button
+                  type="button"
+                  class="flex min-w-0 flex-1 gap-3 py-3 pr-4 text-left"
+                  (click)="open(row)"
+                >
                   <span
-                    class="truncate text-[12.5px]"
-                    [style.fontWeight]="row.read ? 400 : 600"
-                    [style.color]="row.read ? 'var(--stx-muted)' : 'var(--stx-text)'"
-                    >{{ row.subject || t('inbox.noSubject') }}</span
+                    class="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[12px] font-bold"
+                    [style.background]="row.read ? 'var(--stx-surface-2)' : 'var(--stx-ink)'"
+                    [style.color]="row.read ? 'var(--stx-muted)' : '#fff'"
+                    aria-hidden="true"
+                    >{{ initials(displayName(row)) }}</span
                   >
 
-                  @if (row.spamScore !== null && row.spamScore >= 5) {
-                    <span class="mt-1 flex items-center gap-2">
+                  <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span class="flex items-baseline justify-between gap-2">
+                      <span class="truncate text-[13px]" [style.fontWeight]="row.read ? 400 : 700">
+                        @if (showsRecipient()) {
+                          <span [style.color]="'var(--stx-muted-2)'">{{
+                            t('inbox.toPrefix')
+                          }}</span>
+                        }
+                        {{ displayName(row) }}
+                      </span>
                       <span
-                        class="stx-postmark h-8 w-8 text-[8px] leading-tight"
-                        [style.color]="'var(--stx-stamp)'"
-                        >SPAM</span
+                        class="stx-mono shrink-0 text-[10.5px]"
+                        [style.color]="'var(--stx-muted-2)'"
+                        >{{ time(row.receivedAt) }}</span
                       >
-                      <span class="text-[11.5px]" [style.color]="'var(--stx-muted-2)'">{{
-                        t('inbox.flaggedSpam')
-                      }}</span>
                     </span>
-                  }
-                </span>
-              </button>
+                    <span
+                      class="truncate text-[12.5px]"
+                      [style.fontWeight]="row.read ? 400 : 600"
+                      [style.color]="row.read ? 'var(--stx-muted)' : 'var(--stx-text)'"
+                      >{{ row.subject || t('inbox.noSubject') }}</span
+                    >
+
+                    @if (row.spamScore !== null && row.spamScore >= 5) {
+                      <span class="mt-1 flex items-center gap-2">
+                        <span
+                          class="stx-postmark h-8 w-8 text-[8px] leading-tight"
+                          [style.color]="'var(--stx-stamp)'"
+                          >SPAM</span
+                        >
+                        <span class="text-[11.5px]" [style.color]="'var(--stx-muted-2)'">{{
+                          t('inbox.flaggedSpam')
+                        }}</span>
+                      </span>
+                    }
+                  </span>
+                </button>
+              </div>
             }
           }
         }
@@ -187,27 +299,40 @@
           </div>
 
           <div class="flex shrink-0 items-center gap-1">
-            @if (context.archivePath()) {
+            @if (canFlag()) {
+              <button
+                type="button"
+                class="grid h-8 w-8 place-items-center rounded-full"
+                [style.color]="'var(--stx-muted)'"
+                (click)="markUnread(message)"
+                [attr.aria-label]="t('inbox.markUnread')"
+                [attr.title]="t('inbox.markUnread')"
+              >
+                <ng-container *ngTemplateOutlet="iconUnread"></ng-container>
+              </button>
+            }
+            @if (canArchive()) {
               <button
                 type="button"
                 class="grid h-8 w-8 place-items-center rounded-full"
                 [style.color]="'var(--stx-muted)'"
                 (click)="archive(message)"
                 [attr.aria-label]="t('inbox.archive')"
+                [attr.title]="t('inbox.archive')"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <rect x="3" y="4" width="18" height="5" rx="1.5"></rect>
-                  <path d="M5 9v10a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19V9M10 13h4"></path>
-                </svg>
+                <ng-container *ngTemplateOutlet="iconArchive"></ng-container>
+              </button>
+            }
+            @if (canRestore()) {
+              <button
+                type="button"
+                class="grid h-8 w-8 place-items-center rounded-full"
+                [style.color]="'var(--stx-muted)'"
+                (click)="restoreIds([message.id])"
+                [attr.aria-label]="t(restoreLabel())"
+                [attr.title]="t(restoreLabel())"
+              >
+                <ng-container *ngTemplateOutlet="iconRestore"></ng-container>
               </button>
             }
             <button
@@ -215,20 +340,10 @@
               class="grid h-8 w-8 place-items-center rounded-full"
               [style.color]="'var(--stx-muted)'"
               (click)="remove(message)"
-              [attr.aria-label]="t('common.delete')"
+              [attr.aria-label]="t(deleteLabel())"
+              [attr.title]="t(deleteLabel())"
             >
-              <svg
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"></path>
-              </svg>
+              <ng-container *ngTemplateOutlet="iconTrash"></ng-container>
             </button>
           </div>
         </div>
@@ -458,4 +573,163 @@
       (discarded)="onDraftDiscarded()"
     />
   }
+
+  @if (menu(); as at) {
+    <div
+      #contextMenu
+      class="context-menu"
+      role="menu"
+      tabindex="-1"
+      [style.left.px]="at.x"
+      [style.top.px]="at.y"
+      (click)="$event.stopPropagation()"
+      (keydown.escape)="closeMenu()"
+    >
+      @if (menuCount() > 1) {
+        <div class="menu-head stx-eyebrow">
+          {{ t('inbox.menuCount', { count: menuCount() }) }}
+        </div>
+      } @else {
+        <button type="button" role="menuitem" (click)="closeMenu(); open(at.row)">
+          <ng-container *ngTemplateOutlet="iconOpen"></ng-container>
+          <span>{{ t('inbox.open') }}</span>
+        </button>
+        <span class="menu-sep"></span>
+      }
+
+      @if (canFlag()) {
+        <button type="button" role="menuitem" (click)="markRead(menuTargets(), true)">
+          <ng-container *ngTemplateOutlet="iconRead"></ng-container>
+          <span>{{ t('inbox.markRead') }}</span>
+        </button>
+
+        <button type="button" role="menuitem" (click)="markRead(menuTargets(), false)">
+          <ng-container *ngTemplateOutlet="iconUnread"></ng-container>
+          <span>{{ t('inbox.markUnread') }}</span>
+        </button>
+      }
+
+      @if (canArchive()) {
+        <button type="button" role="menuitem" (click)="archiveIds(menuTargets())">
+          <ng-container *ngTemplateOutlet="iconArchive"></ng-container>
+          <span>{{ t('inbox.archive') }}</span>
+        </button>
+      }
+
+      @if (canRestore()) {
+        <button type="button" role="menuitem" (click)="restoreIds(menuTargets())">
+          <ng-container *ngTemplateOutlet="iconRestore"></ng-container>
+          <span>{{ t(restoreLabel()) }}</span>
+        </button>
+      }
+
+      <span class="menu-sep"></span>
+
+      <button type="button" role="menuitem" class="is-danger" (click)="removeIds(menuTargets())">
+        <ng-container *ngTemplateOutlet="iconTrash"></ng-container>
+        <span>{{ t(deleteLabel()) }}</span>
+      </button>
+    </div>
+  }
+
+  <ng-template #iconOpen>
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M15 3h6v6M10 14 21 3M18 13v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h7"></path>
+    </svg>
+  </ng-template>
+
+  <ng-template #iconRead>
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 11 12 5l9 6v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path>
+      <path d="m3 11 9 6 9-6"></path>
+    </svg>
+  </ng-template>
+
+  <ng-template #iconUnread>
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <path d="m3 8 9 6 9-6"></path>
+    </svg>
+  </ng-template>
+
+  <ng-template #iconRestore>
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 13h6l1.5 2h3L15 13h6"></path>
+      <path d="M5 13V6a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v7v6a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"></path>
+      <path d="M12 11V4m0 0L9.5 6.5M12 4l2.5 2.5"></path>
+    </svg>
+  </ng-template>
+
+  <ng-template #iconArchive>
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3" y="4" width="18" height="5" rx="1.5"></rect>
+      <path d="M5 9v10a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19V9M10 13h4"></path>
+    </svg>
+  </ng-template>
+
+  <ng-template #iconTrash>
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"></path>
+    </svg>
+  </ng-template>
 </ng-container>

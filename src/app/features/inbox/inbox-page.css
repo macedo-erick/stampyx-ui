@@ -1,3 +1,123 @@
+.row-shell {
+  position: relative;
+  background: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+.row-shell:hover,
+.row-shell.is-open {
+  background: var(--stx-surface-2);
+}
+
+.row-shell.is-checked {
+  background: color-mix(in srgb, var(--stx-ink) 12%, transparent);
+}
+
+.row-check {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: 0 14px 0 12px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.row-shell:hover .row-check,
+.row-shell.is-checked .row-check,
+.row-check:focus-within,
+.list-pane.is-selecting .row-check {
+  opacity: 1;
+}
+
+.stx-check {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--stx-ink);
+  cursor: pointer;
+}
+
+.bulk-button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--stx-radius-pill);
+  background: transparent;
+  color: var(--stx-muted);
+  cursor: pointer;
+}
+
+.bulk-button:hover {
+  background: var(--stx-surface-2);
+  color: var(--stx-text);
+}
+
+.bulk-divider {
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: var(--stx-line);
+}
+
+.context-menu {
+  position: fixed;
+  z-index: 60;
+  min-width: 216px;
+  padding: 6px;
+  border: 1px solid var(--stx-line);
+  border-radius: var(--stx-radius);
+  background: var(--stx-surface);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 18%);
+}
+
+.context-menu .menu-head {
+  padding: 6px 10px 8px;
+}
+
+.context-menu button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--stx-radius-sm);
+  background: transparent;
+  color: var(--stx-text);
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.context-menu button svg {
+  flex: none;
+  color: var(--stx-muted);
+}
+
+.context-menu button:hover,
+.context-menu button:focus-visible {
+  background: var(--stx-surface-2);
+  outline: none;
+}
+
+.context-menu button.is-danger,
+.context-menu button.is-danger svg {
+  color: var(--stx-stamp);
+}
+
+.context-menu .menu-sep {
+  display: block;
+  height: 1px;
+  margin: 5px 6px;
+  background: var(--stx-line);
+}
+
 .back-button,
 .compose-fab {
   display: none;
@@ -73,5 +193,32 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .bulk-button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .bulk-divider {
+    margin: 0 2px;
+  }
+
+  .row-check {
+    padding: 0 12px 0 10px;
+    opacity: 0;
+  }
+
+  .list-pane.is-selecting .row-check,
+  .row-shell.is-checked .row-check {
+    opacity: 1;
+  }
+
+  .context-menu {
+    min-width: 220px;
+  }
+
+  .context-menu button {
+    padding: 11px 12px;
+    font-size: 13.5px;
   }
 }
