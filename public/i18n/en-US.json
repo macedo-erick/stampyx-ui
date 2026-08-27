@@ -51,7 +51,7 @@
     "selectMessage": "Select a message to read it",
     "from": "From",
     "attachments": "Attachments",
-    "markUnread": "Mark unread",
+    "markUnread": "Mark as unread",
     "move": "Move",
     "delete": "Delete",
     "newMail": "New message from {{sender}}",
@@ -85,7 +85,18 @@
     "noRecipients": "no visible recipient",
     "threadCount": "{{count}} messages in this conversation",
     "threadCollapse": "Collapse message",
-    "threadExpand": "Open message"
+    "threadExpand": "Open message",
+    "markRead": "Mark as read",
+    "open": "Open",
+    "selectAll": "Select all",
+    "clearSelection": "Clear selection",
+    "selectRow": "Select message from {{name}}",
+    "selectedCount": "{{count}} selected",
+    "menuCount": "{{count}} messages",
+    "restore": "Restore",
+    "unarchive": "Unarchive",
+    "deleteForever": "Delete permanently",
+    "batchPartial": "{{count}} messages could not be updated"
   },
   "compose": {
     "title": "New message",

@@ -5,6 +5,11 @@ import type { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type { MessageDetail, MessageSummary, Page } from '../../shared/models';
 
+export interface BulkResult {
+  readonly processed: readonly string[];
+  readonly failed: readonly string[];
+}
+
 export interface SendMessageBody {
   to: string[];
   cc?: string[];
@@ -54,12 +59,16 @@ export class MessageService {
     );
   }
 
-  setRead(mailboxId: string, id: string, read: boolean): Observable<void> {
-    return this.http.put<void>(`${this.base(mailboxId)}/${id}/read`, { read });
+  bulkRead(mailboxId: string, ids: readonly string[], read: boolean): Observable<BulkResult> {
+    return this.http.put<BulkResult>(`${this.base(mailboxId)}/bulk/read`, { ids, read });
   }
 
-  move(mailboxId: string, id: string, folder: string): Observable<void> {
-    return this.http.put<void>(`${this.base(mailboxId)}/${id}/folder`, { folder });
+  bulkMove(mailboxId: string, ids: readonly string[], folder: string): Observable<BulkResult> {
+    return this.http.put<BulkResult>(`${this.base(mailboxId)}/bulk/folder`, { ids, folder });
+  }
+
+  bulkRemove(mailboxId: string, ids: readonly string[]): Observable<BulkResult> {
+    return this.http.post<BulkResult>(`${this.base(mailboxId)}/bulk/delete`, { ids });
   }
 
   remove(mailboxId: string, id: string): Observable<void> {
