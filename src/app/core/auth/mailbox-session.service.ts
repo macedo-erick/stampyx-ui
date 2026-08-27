@@ -22,8 +22,7 @@ const STORAGE_KEY = 'stampyx.mailbox-session';
 // Refreshed early, so a request never leaves with a token that expires in flight.
 const RENEW_MARGIN_MS = 60_000;
 
-// The session of a mailbox user, who has no Keycloak identity: their password is the one
-// Dovecot checks, and the API mints its own token against it.
+// A mailbox user has no Keycloak identity: the API mints its own token against the password Dovecot checks.
 @Service()
 export class MailboxSessionService {
   private readonly http = inject(HttpClient);

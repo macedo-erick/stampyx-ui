@@ -35,8 +35,7 @@ export class InboxPage {
   protected readonly loading = signal(true);
   protected readonly composeOpen = signal(false);
   protected readonly seed = signal<ComposeSeed | null>(null);
-  // The conversation the open message belongs to, bodies included: the pane shows the whole
-  // exchange stacked, the way a mail client does, rather than one message at a time.
+  // The whole conversation with bodies: the pane stacks the exchange rather than one message.
   protected readonly conversation = signal<MessageDetail[]>([]);
   protected readonly expanded = signal<ReadonlySet<string>>(new Set());
   // The full envelope - every recipient, the Message-ID, the folder - is reference material
@@ -75,8 +74,7 @@ export class InboxPage {
   });
 
   constructor() {
-    // Straight from /me: listing every domain to reach the mailboxes was an extra round per
-    // domain, and a mailbox user is not allowed to list domains at all.
+    // Straight from /me: listing domains cost a round each, and a mailbox user may not list them.
     effect(() => {
       if (this.me.me() !== undefined) {
         this.loading.set(false);
@@ -108,17 +106,15 @@ export class InboxPage {
       this.clearSelection();
     });
 
-    // A push only belongs in the list the user is actually looking at. Subscribed, not
-    // observed: as an effect this re-ran whenever the folder or the mailbox changed and
-    // announced the last arrival over again, so switching folders rang for old mail.
+    // Subscribed, not observed: as an effect it re-ran on every folder change and re-announced
+    // the last arrival, so switching folders rang for old mail.
     this.realtime.received$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event.mailboxId !== this.mailboxId()) {
         return;
       }
 
       if (event.folder === this.context.folder()) {
-        // A refresh in flight can already have brought it in, and the mirror keys the row by
-        // the same id, so the push must not put a second copy at the top.
+        // A refresh in flight may already hold it under the same id, so the push must not duplicate it.
         this.items.update((rows) =>
           rows.some((row) => row.id === event.id) ? rows : [toSummary(event), ...rows],
         );
@@ -156,8 +152,7 @@ export class InboxPage {
 
     const wasUnread = !message.read;
 
-    // A draft is unfinished writing, not something to read: it reopens in the composer with
-    // the fields as they were left, and saving or sending replaces it.
+    // A draft reopens in the composer as it was left; saving or sending replaces it.
     if (this.context.folder() === this.context.draftsPath()) {
       this.messages.read(id, message.id).subscribe({
         next: (detail) => {
@@ -172,8 +167,7 @@ export class InboxPage {
           });
           this.composeOpen.set(true);
         },
-        // A draft edited in another client leaves the same dead row behind. Silence made it
-        // look like the click did nothing at all, so say it and reload the folder.
+        // Another client editing the draft leaves the same dead row; silence read as a dead click.
         error: () => {
           this.toast.add({
             severity: 'warn',
@@ -186,8 +180,7 @@ export class InboxPage {
       return;
     }
 
-    // One request: the conversation comes back with the message in it, already marked read.
-    // Opening used to cost a read plus a thread call, which is the traffic you were seeing.
+    // One request: the conversation comes back with the message read. It used to cost two.
     this.messages.thread(id, message.id).subscribe({
       next: (rows) => {
         const focus = rows.find((row) => row.id === message.id) ?? rows.at(-1) ?? null;
@@ -200,8 +193,7 @@ export class InboxPage {
           rows.map((row) => (row.id === message.id ? { ...row, read: true } : row)),
         );
 
-        // Only an unread message changes a folder badge. Reloading on every open made the
-        // sidebar refetch for nothing, which is what showed up as a flicker on sent mail.
+        // Only an unread message moves a badge; reloading on every open flickered the sidebar.
         if (wasUnread) {
           this.context.reloadFolders();
         }
@@ -249,8 +241,7 @@ export class InboxPage {
     return this.detailsOpen().has(message.id);
   }
 
-  // The oldest message names the conversation: every reply carries the same subject with a
-  // prefix stacked on top.
+  // The oldest message names the conversation; replies only stack a prefix on it.
   protected readonly threadSubject = computed(
     () => this.conversation()[0]?.subject ?? this.selected()?.subject ?? '',
   );
@@ -295,9 +286,8 @@ export class InboxPage {
     this.refresh();
   }
 
-  // Saving rewrites the draft: the old copy is removed from IMAP and a new one is appended,
-  // so the row that is on screen points at a message that is gone. Refetching is what makes
-  // the draft clickable again, and Drafts counts what it holds, so the badge moves too.
+  // Saving rewrites the draft under a new id, so the row on screen points at nothing until a
+  // refetch. Drafts counts what it holds, so the badge moves with it.
   protected onDraftSaved(): void {
     this.closeCompose();
     this.refresh();
@@ -312,9 +302,8 @@ export class InboxPage {
     this.context.reloadFolders();
   }
 
-  // The compose flag has to leave the URL too: the sidebar navigates to ?compose=1, and
-  // navigating to a URL the router is already on emits nothing, so the panel would never
-  // reopen after the first time.
+  // The compose flag must leave the URL: the router emits nothing for a URL it is already on,
+  // so ?compose=1 would never reopen the panel a second time.
   protected closeCompose(): void {
     this.composeOpen.set(false);
     this.seed.set(null);
@@ -351,8 +340,7 @@ export class InboxPage {
       // A forward opens a new thread: it is not a reply to the original.
       inReplyTo: null,
       body: quoted(message),
-      // Flattening an HTML message into text costs it every link and every image, so the
-      // markup travels when there is markup to travel.
+      // Flattening HTML to text costs every link and image, so markup travels when there is any.
       html: message.html === null ? null : quotedHtml(message),
     });
     this.composeOpen.set(true);
@@ -456,8 +444,7 @@ function quotedHtml(message: MessageDetail): string {
   return `<p><br></p><p>${header}</p>${message.html ?? ''}`;
 }
 
-// The sender is an address, not markup: it goes in as text even when the body around it
-// is markup.
+// The sender is an address, not markup: it goes in as text either way.
 function escapeHtml(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }

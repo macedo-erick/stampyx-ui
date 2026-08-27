@@ -34,8 +34,7 @@ export class FoldersPage {
     this.context.folders().filter((row) => !row.system),
   );
 
-  // Only a folder that is not itself nested can take children: one level is what the
-  // sidebar can show without turning into a tree widget.
+  // One level only: more than the sidebar can show without becoming a tree widget.
   protected readonly parentOptions = computed(() =>
     this.ownFolders().filter((row) => row.parent === null),
   );

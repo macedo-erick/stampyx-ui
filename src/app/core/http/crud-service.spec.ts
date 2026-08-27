@@ -131,8 +131,7 @@ describe('CrudService', () => {
     expect(service.items()).toEqual([]);
   });
 
-  // `items()` rethrows the failure rather than falling back to the default value, so a template
-  // that reads it without checking `hasError()` first will bring the page down with it.
+  // `items()` rethrows rather than falling back, so a template that skips `hasError()` takes the page down.
   it('reports a failed collection load, and refuses to hand back items until it is retried', async () => {
     TestBed.tick();
     http.expectOne(BASE_URL).flush('nope', { status: 500, statusText: 'Server Error' });

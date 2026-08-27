@@ -1,7 +1,6 @@
-/* Copied from the Keycloak login theme at auth/themes/stampyx/login/resources/css/stampyx.css
-   so the two sign-in screens are one design. Scoped to this component: the rest of the panel
-   keeps its own denser tokens. Dark follows ThemeService's `app-dark` on the root, which
-   writes the same localStorage key the theme reads, so the choice carries across both. */
+/* Copied from the Keycloak login theme (auth/themes/stampyx/login/resources/css/stampyx.css) so
+   both sign-in screens are one design; scoped here, as the panel keeps denser tokens. Dark follows
+   ThemeService's `app-dark`, which writes the same localStorage key the theme reads. */
 :host {
   --stx-bg: #f1efe8;
   --stx-surface: #ffffff;
@@ -238,8 +237,8 @@
   font-size: 0.95rem;
 }
 
-/* Verbatim from the theme. Without the !important the `:focus-visible` rule further down
-   wins on equal specificity and paints a second ring inside the affix's own focus border. */
+/* Verbatim from the theme. Without !important, `:focus-visible` below ties on specificity
+   and paints a second ring inside the affix's focus border. */
 .stx-input,
 .stx-affix input {
   border: 0 !important;

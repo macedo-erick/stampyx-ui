@@ -6,8 +6,7 @@ import { FolderService } from './api/folder.service';
 import { MeService } from './api/me.service';
 import { RealtimeService } from './realtime.service';
 
-// The shell draws the folder list and the inbox reads messages from it, so the selected
-// mailbox and folder cannot live inside either one.
+// The shell draws the folder list and the inbox reads from it, so the selection lives in neither.
 @Service()
 export class MailboxContext {
   private readonly me = inject(MeService);
@@ -15,9 +14,8 @@ export class MailboxContext {
   private readonly realtime = inject(RealtimeService);
 
   constructor() {
-    // Mail arriving is the one thing that changes a badge without the panel doing anything,
-    // so it is the one thing that has to refetch them. Everything else - reading, moving,
-    // deleting - already reloads on its way out.
+    // Mail arriving is the only thing that moves a badge without the panel acting, so the only
+    // thing that must refetch. Reading, moving and deleting already reload on their way out.
     this.realtime.received$.pipe(takeUntilDestroyed()).subscribe(() => this.reloadFolders());
   }
 
