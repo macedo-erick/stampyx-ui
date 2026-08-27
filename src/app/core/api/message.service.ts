@@ -39,17 +39,14 @@ export class MessageService {
     return this.http.post<{ messageId: string }>(this.base(mailboxId), body);
   }
 
-  // Never reaches the MTA: composed and appended straight into Drafts.
   saveDraft(mailboxId: string, body: SendMessageBody): Observable<void> {
     return this.http.post<void>(`${this.base(mailboxId)}/drafts`, body);
   }
 
-  // The whole conversation oldest first, marked read on the way: one call, not a read plus a thread.
   thread(mailboxId: string, id: string): Observable<MessageDetail[]> {
     return this.http.get<MessageDetail[]>(`${this.base(mailboxId)}/${id}/thread`);
   }
 
-  // Through HttpClient, not a link: the endpoint needs a bearer token an <a href> cannot carry.
   attachment(mailboxId: string, id: string, index: number): Observable<Blob> {
     return this.http.get(
       `${this.base(mailboxId)}/${encodeURIComponent(id)}/attachments/${String(index)}`,

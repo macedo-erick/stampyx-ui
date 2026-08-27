@@ -46,7 +46,6 @@ export class AdminPage {
   protected removeAccount(account: AdminAccount): void {
     this.confirm.confirm({
       header: this.transloco.translate('admin.confirmDeleteAccountTitle'),
-      // Deleting a tenant takes their domains, mailboxes and mail; this question is the only warning.
       message: this.transloco.translate('admin.confirmDeleteAccount', {
         email: account.email,
         count: account.mailboxCount,

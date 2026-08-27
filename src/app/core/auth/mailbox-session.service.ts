@@ -19,10 +19,8 @@ interface StoredSession {
 }
 
 const STORAGE_KEY = 'stampyx.mailbox-session';
-// Refreshed early, so a request never leaves with a token that expires in flight.
 const RENEW_MARGIN_MS = 60_000;
 
-// A mailbox user has no Keycloak identity: the API mints its own token against the password Dovecot checks.
 @Service()
 export class MailboxSessionService {
   private readonly http = inject(HttpClient);
@@ -60,7 +58,6 @@ export class MailboxSessionService {
     const refreshToken = this.session()?.refreshToken;
 
     if (refreshToken !== undefined) {
-      // Best effort: the local session is dropped either way.
       this.http.post(`${this.base}/logout`, { refreshToken }).subscribe({ error: () => undefined });
     }
 
@@ -110,7 +107,6 @@ export class MailboxSessionService {
   }
 }
 
-// Storage throws outright in some privacy modes, so every access is guarded.
 function restore(): StoredSession | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -131,7 +127,7 @@ function safeWrite(session: StoredSession): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
   } catch {
-    // A session that cannot be persisted still works until the tab closes.
+    return;
   }
 }
 
@@ -139,6 +135,6 @@ function safeRemove(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch {
-    // Nothing to do: the in-memory signal is already cleared.
+    return;
   }
 }

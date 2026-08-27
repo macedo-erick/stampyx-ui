@@ -5,16 +5,11 @@
 @import 'tailwindcss/utilities.css' layer(utilities);
 @import 'primeicons/primeicons.css';
 
-/* PrimeNG's p-editor is a Quill wrapper and ships no theme of its own. Snow is the toolbar
-   and, more to the point, the link tooltip. Global rather than component-scoped: Quill builds
-   its DOM at runtime, so Angular's emulated encapsulation attributes never reach it. */
 @import 'quill/dist/quill.snow.css';
 
 @plugin 'tailwindcss-primeui';
 @custom-variant dark (&:where(.app-dark, .app-dark *));
 
-/* The mockup palette is the brand, Aura is the system. Redefining Aura's own custom properties
-   rather than out-specifying them keeps every component computing its states from these values. */
 :root {
   --stx-ink: #2d6f8a;
   --stx-ink-text: #215b76;
@@ -34,7 +29,6 @@
 
   --stx-line-strong: #c7c0ad;
 
-  /* Three steps, not one: cards, fields and pills. A single 3px read as square next to sign-in. */
   --stx-radius: 14px;
   --stx-radius-sm: 8px;
   --stx-radius-pill: 999px;
@@ -68,7 +62,6 @@
   --p-primary-hover-color: var(--stx-ink-text);
   --p-content-background: var(--stx-surface);
   --p-content-border-color: var(--stx-line);
-  /* Fields and menus take the field radius; the page's own cards use --stx-radius directly. */
   --p-content-border-radius: var(--stx-radius-sm);
   --p-border-radius-sm: var(--stx-radius-sm);
   --p-border-radius-md: var(--stx-radius-sm);
@@ -93,8 +86,6 @@ body {
   font-size: 14px;
 }
 
-/* The browser's own rail ignores the theme and shows up mid-panel everywhere, so it is styled
-   once here for every scrolling area. */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--stx-line-strong) transparent;
@@ -110,7 +101,6 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  /* The border insets the thumb and padding-box keeps the background off it, so it reads as a pill. */
   border: 3px solid transparent;
   border-radius: var(--stx-radius-pill);
   background: var(--stx-line-strong);
@@ -126,8 +116,6 @@ body {
   background: transparent;
 }
 
-/* Headless confirm dialog: PrimeNG still draws its own panel, flattened here so the card is not framed twice. */
-/* Both classes, so it outranks .p-dialog no matter which stylesheet the theme lands in. */
 .p-dialog.p-confirmdialog {
   background: transparent;
   border: 0;
@@ -159,7 +147,6 @@ body {
   font-family: var(--stx-mono);
 }
 
-/* The postmark: a rotated dashed stamp, used for status and for the brand mark. */
 .stx-postmark {
   display: inline-flex;
   align-items: center;
@@ -207,12 +194,12 @@ body {
   background: color-mix(in srgb, var(--stx-stamp) 12%, transparent);
 }
 
-/* iOS zooms a focused field under 16px; only applies where the pointer is coarse. */
 @media (pointer: coarse) {
   input,
   select,
-  textarea {
-    font-size: 16px;
+  textarea,
+  .ql-editor {
+    font-size: 16px !important;
   }
 }
 
@@ -225,7 +212,6 @@ body {
   }
 }
 
-/* Shared shapes for the panel, so a screen does not have to restate them. */
 .stx-card {
   background: var(--stx-surface);
   border: 1px solid var(--stx-line);
@@ -252,8 +238,6 @@ body {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--stx-ink) 22%, transparent);
 }
 
-/* A password field you can check before saving. The control keeps being the box - only the
-   padding moves to the input, so the eye sits inside the border instead of below it. */
 .stx-secret {
   display: flex;
   align-items: center;
@@ -341,9 +325,6 @@ body {
   color: var(--stx-muted-2);
 }
 
-/* Preflight strips the defaults off every heading, list and quote, which is right for the
-   panel's own chrome and wrong for mail: a message writes its own markup and the composer
-   now produces it. Scoped to the two places that render a message body. */
 .stx-prose h1,
 .stx-prose h2,
 .stx-prose h3 {
@@ -430,8 +411,6 @@ body {
   border-collapse: collapse;
 }
 
-/* Quill in the panel's clothes. Its own chrome is a light-themed 2017 default; these pull it
-   onto the app tokens so it follows the theme switch like everything else. */
 .ql-toolbar.ql-snow {
   display: flex;
   flex-wrap: wrap;
@@ -462,8 +441,6 @@ body {
   font-style: normal;
 }
 
-/* Quill draws its icons as strokes and fills on inline SVG, hard-coded to near-black. In
-   dark mode that is an invisible toolbar. */
 .ql-snow .ql-stroke {
   stroke: var(--stx-muted);
 }
@@ -506,8 +483,6 @@ body {
   border-radius: 10px;
 }
 
-/* The link editor. This is the whole reason the panel moved off window.prompt, so it has to
-   be legible in both themes rather than the theme Quill assumed. */
 .ql-snow .ql-tooltip {
   z-index: 50;
   padding: 7px 9px;
@@ -532,8 +507,6 @@ body {
   color: var(--stx-ink);
 }
 
-/* Quill zeroes the margins on every block so its own editor stays compact, which leaves
-   headings and lists indistinguishable from body text while you are writing them. */
 .ql-snow .ql-editor h1,
 .ql-snow .ql-editor h2,
 .ql-snow .ql-editor h3 {
@@ -570,7 +543,6 @@ body {
   margin-top: 0;
 }
 
-/* Backs the sidebar when it is a drawer. */
 .stx-scrim {
   display: none;
   position: fixed;
@@ -596,7 +568,6 @@ body {
   }
 }
 
-/* Global because Quill builds its toolbar at runtime, out of reach of component styles. */
 @media (max-width: 899px) {
   .stx-compose .p-editor .p-editor-toolbar,
   .stx-compose .p-editor .ql-toolbar {
@@ -618,7 +589,6 @@ body {
     height: 44px;
   }
 
-  /* The template pins the content to 160px inline; only !important reaches that. */
   .stx-compose .p-editor.body {
     display: flex;
     flex: 1;
@@ -637,7 +607,6 @@ body {
   }
 }
 
-/* Unlayered, so these win over the Tailwind utilities in the templates. */
 @media (max-width: 899px) {
   .stx-split {
     flex-direction: column;
@@ -660,5 +629,11 @@ body {
 
   .stx-page-head {
     padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .stx-page-head-actions .stx-pill {
+    padding: 9px 14px;
+    white-space: nowrap;
   }
 }

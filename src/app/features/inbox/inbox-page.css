@@ -4,13 +4,11 @@
 }
 
 @media (max-width: 899px) {
-  /* 208px of sidebar plus 396px of list left nothing for the reader on a 390px phone. */
   .list-pane {
     width: 100%;
     border-right: 0;
   }
 
-  /* Covers the list. Absolute, not fixed, so the top bar stays put above it. */
   .reader-pane {
     position: absolute;
     inset: 0;
@@ -57,5 +55,23 @@
 
   .compose-fab.is-hidden {
     display: none;
+  }
+
+  .reader-bar {
+    padding-inline: 12px;
+    gap: 8px;
+  }
+
+  .reader-bar .stx-pill {
+    min-width: 0;
+    padding: 9px 12px;
+    font-size: 12.5px;
+  }
+
+  .reader-bar .pill-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }

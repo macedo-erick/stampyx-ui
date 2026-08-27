@@ -122,11 +122,10 @@
   color: var(--stx-text);
 }
 
-/* Below the breakpoint the sidebar is a drawer, so the bar grows a button that opens it. */
 @media (max-width: 899px) {
   :host {
-    gap: 4px;
-    padding: 0 8px 0 4px;
+    gap: 6px;
+    padding: 0 12px;
   }
 
   .hamburger,
@@ -134,7 +133,14 @@
     display: grid;
   }
 
-  /* A flex:1 field is what pushed the actions off-screen at 390px. */
+  .hamburger {
+    margin-left: -10px;
+  }
+
+  .brand {
+    margin-right: auto;
+  }
+
   .search {
     display: none;
   }
@@ -143,20 +149,19 @@
     display: flex;
     flex: 1;
     max-width: none;
-    padding-right: 4px;
+    padding: 3px 4px 3px 12px;
   }
 
   .search-close {
     display: grid;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
   }
 
   .is-hidden {
     display: none;
   }
 
-  /* Both live in the drawer's footer down here. */
   .desktop-only {
     display: none;
   }

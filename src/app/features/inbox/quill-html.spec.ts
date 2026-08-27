@@ -10,8 +10,6 @@ describe('inlineQuillFormatting', () => {
     expect(html).not.toContain('ql-align-center');
   });
 
-  // getSemanticHTML already emits the right tag, so this is not a rescue: clients disagree
-  // about default markers and padding, and the message states both rather than hoping.
   it('states the marker and padding on a bulleted list', () => {
     const html = inlineQuillFormatting('<ul><li>one</li><li>two</li></ul>');
 
@@ -26,7 +24,6 @@ describe('inlineQuillFormatting', () => {
     expect(html).toContain('list-style-type:decimal');
   });
 
-  // The one place data-list outlives getSemanticHTML: a checklist has no plain-HTML form.
   it('drops the checklist marker plain HTML cannot express', () => {
     const html = inlineQuillFormatting(
       '<ul><li data-list="checked"><span class="ql-ui"></span>done</li></ul>',
@@ -52,7 +49,6 @@ describe('inlineQuillFormatting', () => {
     );
 
     expect(block).toContain('padding-left:6em');
-    // A list item keeps the 1.5em it already had, so one step is 4.5em rather than 3em.
     expect(item).toContain('padding-left:4.5em');
   });
 
@@ -81,8 +77,6 @@ describe('inlineQuillFormatting', () => {
     expect(inlineQuillFormatting('')).toBe('');
   });
 
-  // The formats a class attributor holds are the whole reason this exists: quill.js
-  // registers align as AlignClass, and convertHTML copies the block's outerHTML verbatim.
   it('inlines every class-held format, which semantic HTML leaves as a class', () => {
     const html = inlineQuillFormatting(
       '<p class="ql-align-center ql-size-large ql-font-monospace ql-indent-1">x</p>',

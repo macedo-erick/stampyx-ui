@@ -24,21 +24,18 @@ export class Shell {
   private readonly router = inject(Router);
 
   constructor() {
-    // Every drawer row navigates, so this covers the folder buttons and routerLinks alike.
     this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.nav.close();
       }
     });
 
-    // An account that signed up but never picked an address has no inbox to show yet.
     effect(() => {
       if (this.me.shouldPromptAddress()) {
         void this.router.navigateByUrl('/onboarding');
       }
     });
 
-    // The folder list belongs to a mailbox, so it can only load once /me has answered.
     effect(() => {
       if (this.context.currentId() !== null) {
         this.context.reloadFolders();

@@ -44,7 +44,6 @@ export class RuleService {
     return this.http.put<FolderRule[]>(`${this.base(mailboxId)}/order`, { ruleIds });
   }
 
-  // Counted against what actually arrived, so a rule is not written blind.
   preview(
     mailboxId: string,
     body: { conditionField: RuleField; conditionOperator: RuleOperator; conditionValue: string },

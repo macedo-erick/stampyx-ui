@@ -125,11 +125,11 @@
     >
       @if (selected(); as message) {
         <div
-          class="flex shrink-0 items-center justify-between gap-3 border-b px-5 py-3"
+          class="reader-bar flex shrink-0 items-center justify-between gap-3 border-b px-5 py-3"
           [style.borderColor]="'var(--stx-line)'"
           [style.background]="'var(--stx-surface)'"
         >
-          <div class="flex items-center gap-2">
+          <div class="flex min-w-0 items-center gap-2">
             <button
               type="button"
               class="back-button"
@@ -165,7 +165,7 @@
               >
                 <path d="M9 17 4 12l5-5M20 18v-2a4 4 0 0 0-4-4H4"></path>
               </svg>
-              {{ t('inbox.reply') }}
+              <span class="pill-label">{{ t('inbox.reply') }}</span>
             </button>
 
             <button type="button" class="stx-pill stx-pill--quiet" (click)="startForward(message)">
@@ -182,11 +182,11 @@
               >
                 <path d="m15 17 5-5-5-5M4 18v-2a4 4 0 0 1 4-4h12"></path>
               </svg>
-              {{ t('inbox.forward') }}
+              <span class="pill-label">{{ t('inbox.forward') }}</span>
             </button>
           </div>
 
-          <div class="flex items-center gap-1">
+          <div class="flex shrink-0 items-center gap-1">
             @if (context.archivePath()) {
               <button
                 type="button"
