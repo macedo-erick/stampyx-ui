@@ -24,9 +24,8 @@ export class RealtimeService {
 
   readonly connected = signal(false);
 
-  // Connection is state; an arrival is not. Holding the last push in a signal meant anything
-  // that read it later - a page revisited, an effect re-run when the folder changed - saw an
-  // old message as a new one and announced it again. A stream is only ever heard live.
+  // Connection is state; an arrival is not. Held in a signal, the last push was re-read later
+  // as a new one and announced again. A stream is only ever heard live.
   private readonly received = new Subject<MailReceived>();
   readonly received$: Observable<MailReceived> = this.received.asObservable();
 
@@ -64,8 +63,7 @@ export class RealtimeService {
       return;
     }
 
-    // socket.io falls back to long-polling on its own, which matters behind a reverse
-    // proxy that has not been told to pass Upgrade.
+    // socket.io falls back to long-polling behind a proxy that was not told to pass Upgrade.
     this.socket = io(environment.socketUrl, {
       path: '/api/socket.io',
       transports: ['websocket', 'polling'],
@@ -91,8 +89,7 @@ export function toSummary(event: MailReceived): MessageSummary {
     id: event.id,
     messageId: event.messageId,
     sender: event.sender,
-    // The push carries neither: a delivered message has no recipient stored, and its thread
-    // is settled server-side. The next list refresh fills both in.
+    // The push carries neither; the next list refresh fills them in.
     recipient: null,
     threadId: null,
     subject: event.subject,

@@ -34,16 +34,14 @@ export class SettingsPage {
 
   protected readonly isMailboxSession = computed(() => this.me.kind() === 'mailbox');
 
-  // A mailbox user changes the one password they have. An account holder is setting the mail
-  // password for their platform address, which only an external client ever needs.
+  // A mailbox user has one password; an account holder is setting the mail password an external client needs.
   protected readonly targetMailbox = computed(
     () => this.me.mailboxes().find((row) => this.isMailboxSession() || row.platform) ?? null,
   );
 
   protected readonly currentPassword = signal('');
   protected readonly newPassword = signal('');
-  // A password you cannot read is a password you retype until it works. Each field has its
-  // own eye, so checking the new one does not put the old one on screen too.
+  // One eye per field, so checking the new password does not put the old one on screen too.
   protected readonly revealCurrent = signal(false);
   protected readonly revealNew = signal(false);
   protected readonly saving = signal(false);

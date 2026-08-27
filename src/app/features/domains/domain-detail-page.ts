@@ -70,8 +70,7 @@ export class DomainDetailPage {
     setTimeout(() => this.copied.set(null), 1500);
   }
 
-  // The check report is keyed by check name and the records by type+host; pairing them is
-  // what lets each row carry its own state instead of a separate strip of chips.
+  // Report keyed by check name, records by type+host: pairing lets each row carry its own state.
   protected statusOf(record: DnsRecord): CheckStatus | null {
     const checks = this.report()?.checks ?? [];
     const name = checkNameFor(record);

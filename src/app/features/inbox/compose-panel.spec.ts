@@ -25,9 +25,8 @@ describe('ComposePanel', () => {
     });
   });
 
-  // The seed is applied from an effect, and the effect can run before the view exists. It
-  // used to mark the seed as applied on that first pass, so a forward opened with its
-  // subject filled in and an empty message.
+  // The seeding effect can run before the view exists; marking it applied on that pass opened
+  // a forward with its subject filled in and an empty message.
   it('puts the seeded body in the editor', () => {
     const fixture = open({
       to: [],
@@ -55,8 +54,7 @@ describe('ComposePanel', () => {
     expect(editor.innerHTML).toContain('href="https://example.test"');
   });
 
-  // Saving files a new copy in Drafts under a new id and drops the old one, so the row that
-  // is on screen is dead. `closed` alone left it there and clicking it did nothing at all.
+  // Saving files a new copy under a new id, so the row on screen is dead; `closed` alone left it there.
   it('reports a saved draft as saved, not merely closed', () => {
     const fixture = open({ to: [], subject: 'Rascunho', inReplyTo: null, body: 'meio escrito' });
 
