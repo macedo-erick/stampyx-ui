@@ -1,0 +1,96 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { MessageService } from 'primeng/api';
+import { beforeEach, describe, expect, it } from 'vitest';
+
+import { provideTestingTransloco } from '../../../testing/transloco';
+import { ComposePanel, type ComposeSeed } from './compose-panel';
+
+// The value the panel hands the editor. Quill needs a real DOM and is loaded by a dynamic
+// import, so it never initialises under jsdom - but what the panel feeds it is exactly the
+// thing these tests are about, and that is reachable without it.
+function seededValue(fixture: { componentInstance: ComposePanel }): string {
+  return (fixture.componentInstance as unknown as { seedHtml: () => string }).seedHtml();
+}
+
+function open(seed: ComposeSeed) {
+  const fixture = TestBed.createComponent(ComposePanel);
+
+  fixture.componentRef.setInput('mailboxId', '9f1d2c3b-0000-4000-8000-000000000000');
+  fixture.componentRef.setInput('seed', seed);
+  fixture.detectChanges();
+
+  return fixture;
+}
+
+describe('ComposePanel', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [provideTestingTransloco()],
+      providers: [provideHttpClient(), provideHttpClientTesting(), MessageService],
+    });
+  });
+
+  // The seed is applied from an effect, and the effect can run before the view exists. It
+  // used to mark the seed as applied on that first pass, so a forward opened with its
+  // subject filled in and an empty message.
+  it('puts the seeded body in the editor', () => {
+    const fixture = open({
+      to: [],
+      subject: 'Fwd: Teste',
+      inReplyTo: null,
+      body: '---------- someone@example.test ----------\nOriginal message',
+    });
+
+    expect(seededValue(fixture)).toContain('Original message');
+  });
+
+  it('keeps the markup when the seed carries html', () => {
+    const fixture = open({
+      to: [],
+      subject: 'Fwd: Teste',
+      inReplyTo: null,
+      body: 'flattened',
+      html: '<p>Original <a href="https://example.test">link</a></p>',
+    });
+
+    expect(seededValue(fixture)).toContain('href="https://example.test"');
+  });
+
+  // Saving files a new copy in Drafts under a new id and drops the old one, so the row that
+  // is on screen is dead. `closed` alone left it there and clicking it did nothing at all.
+  it('reports a saved draft as saved, not merely closed', () => {
+    const fixture = open({ to: [], subject: 'Rascunho', inReplyTo: null, body: 'meio escrito' });
+
+    let saved = 0;
+    let closed = 0;
+
+    fixture.componentInstance.saved.subscribe(() => (saved += 1));
+    fixture.componentInstance.closed.subscribe(() => (closed += 1));
+
+    const buttons: HTMLButtonElement[] = [...fixture.nativeElement.querySelectorAll('button')];
+
+    buttons.find((button) => button.classList.contains('discard'))?.click();
+
+    TestBed.inject(HttpTestingController)
+      .expectOne((request) => request.method === 'POST' && request.url.endsWith('/drafts'))
+      .flush(null);
+
+    expect(saved).toBe(1);
+    expect(closed).toBe(0);
+  });
+
+  it('fills the recipients a reply was opened with', () => {
+    const fixture = open({
+      to: ['someone@example.test'],
+      cc: ['other@example.test'],
+      subject: 'Re: Teste',
+      inReplyTo: '<parent@example.test>',
+      body: '',
+    });
+
+    expect(fixture.nativeElement.textContent).toContain('someone@example.test');
+    expect(fixture.nativeElement.textContent).toContain('other@example.test');
+  });
+});

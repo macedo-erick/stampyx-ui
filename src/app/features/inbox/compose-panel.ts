@@ -23,9 +23,15 @@ import { hasFormatting, inlineQuillFormatting } from './quill-html';
 // onto the original, a forward starts with an empty To and carries the text along.
 export interface ComposeSeed {
   readonly to: string[];
+  readonly cc?: string[];
   readonly subject: string;
   readonly inReplyTo: string | null;
   readonly body: string;
+  // A draft reopens with the markup it was written with, not a flattened copy of it.
+  readonly html?: string | null;
+  // Set when the composer was opened from a draft: saving or sending removes that draft
+  // instead of leaving a trail of half-written copies behind.
+  readonly replacesDraftId?: string;
 }
 
 // Mirrors MAIL_MAX_ATTACHMENT_BYTES. The server enforces it either way; this is only so the
@@ -52,6 +58,10 @@ export class ComposePanel {
   readonly seed = input<ComposeSeed | null>(null);
   readonly closed = output<void>();
   readonly sent = output<void>();
+  // Distinct from `closed`: a saved draft is a new row in Drafts under a new id, and the
+  // list has to be refetched. Closing on its own left the old row on screen, and clicking
+  // it asked for a message that no longer exists.
+  readonly saved = output<void>();
 
   private readonly messages = inject(MessageService);
   private readonly attachmentsApi = inject(AttachmentService);
@@ -74,9 +84,9 @@ export class ComposePanel {
   protected readonly dragging = signal(false);
   private readonly prefilled = signal(false);
 
-  // Written once, when the composer is seeded from Reply or Forward. Bound one way into the
-  // editor on purpose: writing back on every keystroke would hand Quill a new value mid-edit
-  // and move the caret to the end of it.
+  // Written once, when the composer is seeded. Bound one way into the editor on purpose:
+  // writing back on every keystroke would hand Quill a new value mid-edit and move the
+  // caret to the end of it.
   protected readonly seedHtml = signal('');
   private readonly bodyHtml = signal('');
   private readonly bodyText = signal('');
@@ -88,9 +98,13 @@ export class ComposePanel {
   );
 
   private readonly inReplyTo = signal<string | null>(null);
+  private readonly replaces = signal<string | null>(null);
 
   constructor() {
     // Runs once, when the panel opens: after that the fields belong to whoever is typing.
+    // Master's version had to wait for the editor element before applying the seed, or a
+    // forward arrived with its subject and an empty body. p-editor keeps a value written
+    // before Quill exists and applies it on init, so the wait is no longer needed.
     effect(() => {
       const context = this.seed();
 
@@ -100,12 +114,22 @@ export class ComposePanel {
 
       this.prefilled.set(true);
       this.to.set([...context.to]);
+      this.cc.set([...(context.cc ?? [])]);
+      this.showCc.set((context.cc ?? []).length > 0);
       this.subject.set(context.subject);
       this.inReplyTo.set(context.inReplyTo);
+      this.replaces.set(context.replacesDraftId ?? null);
 
-      if (context.body !== '') {
-        const html = textToHtml(context.body);
+      // A draft reopens with the markup it was written with. Sanitized server-side on the
+      // way out of IMAP, so what comes back is safe to mount.
+      const html =
+        context.html != null && context.html !== ''
+          ? context.html
+          : context.body === ''
+            ? ''
+            : textToHtml(context.body);
 
+      if (html !== '') {
         this.seedHtml.set(html);
         this.bodyHtml.set(html);
         this.bodyText.set(context.body);
@@ -166,8 +190,8 @@ export class ComposePanel {
     return address.slice(0, 2).toUpperCase();
   }
 
-  // Quill owns the editing surface now, so the panel only has to keep what it typed. Both
-  // shapes are kept: the message carries a plain-text part as well as the HTML one.
+  // Quill owns the editing surface, so the panel only has to keep what was typed. Both
+  // shapes are kept: the message carries a plain-text part as well as an HTML one.
   protected onBodyChange(event: EditorTextChangeEvent): void {
     this.bodyHtml.set(event.htmlValue ?? '');
     this.bodyText.set(event.textValue);
@@ -239,8 +263,8 @@ export class ComposePanel {
 
     const raw = this.bodyHtml();
     const text = this.bodyText();
-    // Quill's class-based formatting means nothing in the recipient's client, so it is
-    // rewritten as inline styles on the way out rather than stored and hoped for.
+    // Quill leaves alignment and indent as its own CSS classes, which mean nothing in the
+    // recipient's client, so they are rewritten as inline styles on the way out.
     const html = inlineQuillFormatting(raw);
 
     this.sending.set(true);
@@ -256,6 +280,7 @@ export class ComposePanel {
         // arrive wrapped in the <p> Quill puts around every line.
         ...(hasFormatting(raw) ? { html } : {}),
         ...(this.inReplyTo() === null ? {} : { inReplyTo: this.inReplyTo() as string }),
+        ...(this.replaces() === null ? {} : { replacesDraftId: this.replaces() as string }),
         attachmentIds: this.attachments().map((row) => row.id),
       })
       .subscribe({
@@ -272,7 +297,7 @@ export class ComposePanel {
   }
 
   // A draft never reaches the MTA: it is filed in Drafts so it can be picked up from any
-  // client. Reopening one to keep editing is not built yet.
+  // client. Saving replaces the previous one, so it comes back with a new id.
   protected saveDraft(): void {
     if (this.savingDraft()) {
       return;
@@ -292,6 +317,7 @@ export class ComposePanel {
         text: this.bodyText(),
         ...(hasFormatting(raw) ? { html } : {}),
         attachmentIds: this.attachments().map((row) => row.id),
+        ...(this.replaces() === null ? {} : { replacesDraftId: this.replaces() as string }),
       })
       .subscribe({
         next: () => {
@@ -300,7 +326,7 @@ export class ComposePanel {
             severity: 'success',
             summary: this.transloco.translate('compose.draftSaved'),
           });
-          this.closed.emit();
+          this.saved.emit();
         },
         error: () => this.savingDraft.set(false),
       });
@@ -348,6 +374,7 @@ export class ComposePanel {
   }
 }
 
+// The commands whose pressed state the toolbar reflects.
 // A forward seeds the body with the quoted original as plain text. Quill takes HTML, and
 // handing it raw text would render the quote's own angle brackets as markup.
 function textToHtml(text: string): string {

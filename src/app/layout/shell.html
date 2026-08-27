@@ -11,5 +11,28 @@
 <p-toast position="bottom-right" />
 
 <!-- ConfirmationService only posts an event; without this rendered, every confirm() was a
-     silent no-op and the delete buttons did nothing. -->
-<p-confirmdialog [style]="{ width: '26rem' }" />
+     silent no-op and the delete buttons did nothing. Headless: PrimeNG keeps the mask, the
+     focus trap and Escape, and the panel itself is ours, so a destructive question looks
+     like the rest of the app instead of a stock blue Yes/No. -->
+<p-confirmdialog [style]="{ width: '25rem' }">
+  <ng-template #headless let-confirmation let-onAccept="onAccept" let-onReject="onReject">
+    <div class="stx-card stx-confirm" *transloco="let t">
+      <span class="stx-eyebrow">{{ confirmation.header ?? t('common.confirm') }}</span>
+      <p class="stx-confirm-body">{{ confirmation.message }}</p>
+
+      <div class="stx-confirm-actions">
+        <button type="button" class="stx-pill stx-pill--quiet" (click)="onReject()">
+          {{ confirmation.rejectLabel ?? t('common.cancel') }}
+        </button>
+        <button
+          type="button"
+          class="stx-pill"
+          [class]="confirmation.acceptButtonStyleClass ?? ''"
+          (click)="onAccept()"
+        >
+          {{ confirmation.acceptLabel ?? t('common.confirm') }}
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</p-confirmdialog>

@@ -56,10 +56,8 @@
         <span class="row-label">{{
           t('folders.system.' + row.path.toLowerCase(), { name: row.name })
         }}</span>
-        @if (row.unread > 0) {
-          <span class="count is-unread">{{ row.unread }}</span>
-        } @else if (row.total > 0) {
-          <span class="count">{{ row.total }}</span>
+        @if (badge(row) > 0) {
+          <span class="count" [class.is-unread]="row.unread > 0">{{ badge(row) }}</span>
         }
       </button>
     }
@@ -74,10 +72,8 @@
       >
         <span class="dot" aria-hidden="true"></span>
         <span class="row-label">{{ row.name }}</span>
-        @if (row.unread > 0) {
-          <span class="count is-unread">{{ row.unread }}</span>
-        } @else if (row.total > 0) {
-          <span class="count">{{ row.total }}</span>
+        @if (badge(row) > 0) {
+          <span class="count" [class.is-unread]="row.unread > 0">{{ badge(row) }}</span>
         }
       </button>
     }

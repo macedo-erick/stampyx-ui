@@ -1,4 +1,5 @@
 import { DestroyRef, Service, inject, signal } from '@angular/core';
+import { type Observable, Subject } from 'rxjs';
 import { type Socket, io } from 'socket.io-client';
 
 import { environment } from '../../environments/environment';
@@ -22,10 +23,18 @@ export class RealtimeService {
   private joined: string | null = null;
 
   readonly connected = signal(false);
-  readonly lastReceived = signal<MailReceived | null>(null);
+
+  // Connection is state; an arrival is not. Holding the last push in a signal meant anything
+  // that read it later - a page revisited, an effect re-run when the folder changed - saw an
+  // old message as a new one and announced it again. A stream is only ever heard live.
+  private readonly received = new Subject<MailReceived>();
+  readonly received$: Observable<MailReceived> = this.received.asObservable();
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => this.disconnect());
+    inject(DestroyRef).onDestroy(() => {
+      this.received.complete();
+      this.disconnect();
+    });
   }
 
   join(mailboxId: string): void {
@@ -73,17 +82,17 @@ export class RealtimeService {
     });
 
     this.socket.on('disconnect', () => this.connected.set(false));
-    this.socket.on('mail:received', (event: MailReceived) => this.lastReceived.set(event));
+    this.socket.on('mail:received', (event: MailReceived) => this.received.next(event));
   }
 }
 
-// The push carries the envelope the notify pipe could read off the message; a delivered
-// mail has no recipient column and its thread root is only known once the row is listed.
 export function toSummary(event: MailReceived): MessageSummary {
   return {
     id: event.id,
     messageId: event.messageId,
     sender: event.sender,
+    // The push carries neither: a delivered message has no recipient stored, and its thread
+    // is settled server-side. The next list refresh fills both in.
     recipient: null,
     threadId: null,
     subject: event.subject,

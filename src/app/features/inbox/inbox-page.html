@@ -74,14 +74,17 @@
                   [style.background]="row.read ? 'var(--stx-surface-2)' : 'var(--stx-ink)'"
                   [style.color]="row.read ? 'var(--stx-muted)' : '#fff'"
                   aria-hidden="true"
-                  >{{ initials(counterpart(row)) }}</span
+                  >{{ initials(displayName(row)) }}</span
                 >
 
                 <span class="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span class="flex items-baseline justify-between gap-2">
-                    <span class="truncate text-[13px]" [style.fontWeight]="row.read ? 400 : 700">{{
-                      counterpart(row)
-                    }}</span>
+                    <span class="truncate text-[13px]" [style.fontWeight]="row.read ? 400 : 700">
+                      @if (showsRecipient()) {
+                        <span [style.color]="'var(--stx-muted-2)'">{{ t('inbox.toPrefix') }}</span>
+                      }
+                      {{ displayName(row) }}
+                    </span>
                     <span
                       class="stx-mono shrink-0 text-[10.5px]"
                       [style.color]="'var(--stx-muted-2)'"
@@ -122,39 +125,41 @@
           [style.borderColor]="'var(--stx-line)'"
           [style.background]="'var(--stx-surface)'"
         >
-          <button type="button" class="stx-pill stx-pill--quiet" (click)="startReply(message)">
-            <svg
-              viewBox="0 0 24 24"
-              width="14"
-              height="14"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M9 17 4 12l5-5M20 18v-2a4 4 0 0 0-4-4H4"></path>
-            </svg>
-            {{ t('inbox.reply') }}
-          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" class="stx-pill stx-pill--quiet" (click)="startReply(message)">
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 17 4 12l5-5M20 18v-2a4 4 0 0 0-4-4H4"></path>
+              </svg>
+              {{ t('inbox.reply') }}
+            </button>
 
-          <button type="button" class="stx-pill stx-pill--quiet" (click)="startForward(message)">
-            <svg
-              viewBox="0 0 24 24"
-              width="14"
-              height="14"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="m15 17 5-5-5-5M4 18v-2a4 4 0 0 1 4-4h12"></path>
-            </svg>
-            {{ t('inbox.forward') }}
-          </button>
+            <button type="button" class="stx-pill stx-pill--quiet" (click)="startForward(message)">
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m15 17 5-5-5-5M4 18v-2a4 4 0 0 1 4-4h12"></path>
+              </svg>
+              {{ t('inbox.forward') }}
+            </button>
+          </div>
 
           <div class="flex items-center gap-1">
             @if (context.archivePath()) {
@@ -204,142 +209,189 @@
         </div>
 
         <div class="min-h-0 flex-1 overflow-auto p-5">
-          <article class="stx-card flex flex-col gap-5 p-6">
-            <h1 class="text-xl leading-tight font-bold tracking-tight">
-              {{ message.subject || t('inbox.noSubject') }}
-            </h1>
-
-            <div class="flex items-start gap-3">
-              <span
-                class="grid h-10 w-10 shrink-0 place-items-center rounded-full text-[13px] font-bold"
-                [style.background]="'var(--stx-ink)'"
-                [style.color]="'#fff'"
-                aria-hidden="true"
-                >{{ initials(message.sender) }}</span
-              >
-              <div class="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span class="stx-mono truncate text-[12px]">{{ message.sender }}</span>
-                <span class="truncate text-[11.5px]" [style.color]="'var(--stx-muted-2)'">
-                  @if (message.to.length > 0) {
-                    {{ t('inbox.toLine', { names: message.to.join(', ') }) }}
-                  } @else {
-                    {{ t('inbox.noRecipients') }}
-                  }
-                </span>
-              </div>
-
-              <div class="flex shrink-0 items-center gap-2">
-                <span class="stx-mono text-[11px]" [style.color]="'var(--stx-muted-2)'">{{
-                  fullDate(message.receivedAt)
+          <div class="mx-auto flex w-full max-w-3xl flex-col gap-3">
+            <div class="flex flex-wrap items-baseline justify-between gap-3">
+              <h1 class="text-xl leading-tight font-bold tracking-tight">
+                {{ threadSubject() || t('inbox.noSubject') }}
+              </h1>
+              @if (conversation().length > 1) {
+                <span class="stx-eyebrow">{{
+                  t('inbox.threadCount', { count: conversation().length })
                 }}</span>
+              }
+            </div>
+
+            @for (row of conversation(); track row.id) {
+              <article
+                class="stx-card flex flex-col overflow-hidden"
+                [style.borderColor]="
+                  selected()?.id === row.id ? 'var(--stx-line-strong)' : 'var(--stx-line)'
+                "
+              >
                 <button
                   type="button"
-                  class="grid h-7 w-7 place-items-center rounded-full"
-                  [style.color]="'var(--stx-muted)'"
-                  [style.background]="detailsOpen() ? 'var(--stx-surface-2)' : 'transparent'"
-                  (click)="detailsOpen.set(!detailsOpen())"
-                  [attr.aria-expanded]="detailsOpen()"
-                  [attr.aria-label]="t('inbox.details')"
+                  class="flex w-full items-center gap-3 px-5 py-4 text-left"
+                  (click)="toggle(row)"
+                  [attr.aria-expanded]="isExpanded(row)"
+                  [attr.aria-label]="
+                    isExpanded(row) ? t('inbox.threadCollapse') : t('inbox.threadExpand')
+                  "
                 >
+                  <span
+                    class="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[12px] font-bold"
+                    [style.background]="'var(--stx-ink)'"
+                    [style.color]="'#fff'"
+                    aria-hidden="true"
+                    >{{ initials(row.sender) }}</span
+                  >
+
+                  <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span class="stx-mono truncate text-[12px]">{{ row.sender }}</span>
+                    @if (isExpanded(row)) {
+                      @if (row.to.length > 0) {
+                        <span class="truncate text-[11.5px]" [style.color]="'var(--stx-muted-2)'">{{
+                          t('inbox.toLine', { names: row.to.join(', ') })
+                        }}</span>
+                      }
+                    } @else {
+                      <span class="truncate text-[12px]" [style.color]="'var(--stx-muted)'">{{
+                        preview(row)
+                      }}</span>
+                    }
+                  </span>
+
+                  <span
+                    class="stx-mono shrink-0 text-[10.5px]"
+                    [style.color]="'var(--stx-muted-2)'"
+                    >{{ time(row.receivedAt) }}</span
+                  >
+
                   <svg
                     viewBox="0 0 24 24"
-                    width="15"
-                    height="15"
+                    width="14"
+                    height="14"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="2"
+                    stroke-width="2.2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    [style.transform]="detailsOpen() ? 'rotate(180deg)' : 'none'"
+                    class="shrink-0"
+                    [style.color]="'var(--stx-muted-2)'"
+                    [style.transform]="isExpanded(row) ? 'rotate(180deg)' : 'none'"
+                    aria-hidden="true"
                   >
                     <path d="m6 9 6 6 6-6"></path>
                   </svg>
                 </button>
-              </div>
-            </div>
 
-            @if (detailsOpen()) {
-              <dl
-                class="grid gap-x-4 gap-y-1.5 rounded-xl border px-4 py-3 text-[11.5px]"
-                style="grid-template-columns: auto minmax(0, 1fr)"
-                [style.borderColor]="'var(--stx-line)'"
-                [style.background]="'var(--stx-surface-2)'"
-              >
-                <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.from') }}</dt>
-                <dd class="stx-mono break-all">{{ message.sender }}</dd>
+                @if (isExpanded(row)) {
+                  <div class="flex flex-col gap-4 px-5 pb-5">
+                    <div class="flex items-center justify-between gap-3">
+                      <span class="stx-mono text-[11px]" [style.color]="'var(--stx-muted-2)'">{{
+                        fullDate(row.receivedAt)
+                      }}</span>
+                      <button
+                        type="button"
+                        class="rounded-full px-2.5 py-1 text-[11px]"
+                        [style.color]="'var(--stx-muted)'"
+                        [style.background]="
+                          showsDetails(row) ? 'var(--stx-surface-2)' : 'transparent'
+                        "
+                        (click)="toggleDetails(row)"
+                        [attr.aria-expanded]="showsDetails(row)"
+                      >
+                        {{ t('inbox.details') }}
+                      </button>
+                    </div>
 
-                <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.to') }}</dt>
-                <dd class="stx-mono break-all">
-                  {{ message.to.join(', ') || t('inbox.noRecipients') }}
-                </dd>
+                    @if (showsDetails(row)) {
+                      <dl
+                        class="grid gap-x-4 gap-y-1.5 rounded-xl border px-4 py-3 text-[11.5px]"
+                        style="grid-template-columns: auto minmax(0, 1fr)"
+                        [style.borderColor]="'var(--stx-line)'"
+                        [style.background]="'var(--stx-surface-2)'"
+                      >
+                        <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.from') }}</dt>
+                        <dd class="stx-mono break-all">{{ row.sender }}</dd>
 
-                @if (message.cc.length > 0) {
-                  <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.cc') }}</dt>
-                  <dd class="stx-mono break-all">{{ message.cc.join(', ') }}</dd>
+                        <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.toPrefix') }}</dt>
+                        <dd class="stx-mono break-all">
+                          {{ row.to.join(', ') || t('inbox.noRecipients') }}
+                        </dd>
+
+                        @if (row.cc.length > 0) {
+                          <dt [style.color]="'var(--stx-muted-2)'">{{ t('compose.cc') }}</dt>
+                          <dd class="stx-mono break-all">{{ row.cc.join(', ') }}</dd>
+                        }
+
+                        <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.date') }}</dt>
+                        <dd>{{ fullDate(row.receivedAt) }}</dd>
+
+                        <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.folder') }}</dt>
+                        <dd>{{ row.folder }}</dd>
+
+                        @if (row.spamScore !== null) {
+                          <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.spamScore') }}</dt>
+                          <dd class="stx-mono">{{ row.spamScore }}</dd>
+                        }
+
+                        <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.messageId') }}</dt>
+                        <dd class="stx-mono break-all" [style.color]="'var(--stx-muted)'">
+                          {{ row.messageId }}
+                        </dd>
+                      </dl>
+                    }
+
+                    <div class="h-px" [style.background]="'var(--stx-line)'"></div>
+
+                    @if (row.html) {
+                      <div class="stx-prose text-sm leading-relaxed" [innerHTML]="row.html"></div>
+                    } @else {
+                      <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ row.text }}</p>
+                    }
+
+                    @if (row.attachments.length > 0) {
+                      <div class="flex flex-wrap gap-2">
+                        @for (file of row.attachments; track file.filename; let i = $index) {
+                          <button
+                            type="button"
+                            class="flex items-center gap-2.5 rounded-xl border px-3 py-2"
+                            [style.borderColor]="'var(--stx-line)'"
+                            [style.background]="'var(--stx-surface-2)'"
+                            (click)="download(row, i)"
+                            [attr.aria-label]="t('inbox.download', { name: file.filename })"
+                          >
+                            <span class="stx-mono text-[12px]">{{ file.filename }}</span>
+                            <span
+                              class="stx-mono text-[10.5px]"
+                              [style.color]="'var(--stx-muted-2)'"
+                              >{{ humanSize(file.size) }}</span
+                            >
+                            <svg
+                              viewBox="0 0 24 24"
+                              width="15"
+                              height="15"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="1.9"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              [style.color]="'var(--stx-ink)'"
+                              aria-hidden="true"
+                            >
+                              <path
+                                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
+                              ></path>
+                            </svg>
+                          </button>
+                        }
+                      </div>
+                    }
+                  </div>
                 }
-
-                <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.date') }}</dt>
-                <dd>{{ fullDate(message.receivedAt) }}</dd>
-
-                <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.folder') }}</dt>
-                <dd>{{ message.folder }}</dd>
-
-                @if (message.spamScore !== null) {
-                  <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.spamScore') }}</dt>
-                  <dd class="stx-mono">{{ message.spamScore }}</dd>
-                }
-
-                <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.messageId') }}</dt>
-                <dd class="stx-mono break-all" [style.color]="'var(--stx-muted)'">
-                  {{ message.messageId }}
-                </dd>
-              </dl>
+              </article>
             }
-
-            <div class="h-px" [style.background]="'var(--stx-line)'"></div>
-
-            @if (message.html) {
-              <div class="stx-prose text-sm leading-relaxed" [innerHTML]="message.html"></div>
-            } @else {
-              <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ message.text }}</p>
-            }
-
-            @if (message.attachments.length > 0) {
-              <div class="flex flex-wrap gap-2">
-                @for (file of message.attachments; track file.filename; let i = $index) {
-                  <button
-                    type="button"
-                    class="flex items-center gap-2.5 rounded-xl border px-3 py-2"
-                    [style.borderColor]="'var(--stx-line)'"
-                    [style.background]="'var(--stx-surface-2)'"
-                    (click)="download(message, i)"
-                    [attr.aria-label]="t('inbox.download', { name: file.filename })"
-                  >
-                    <span class="stx-mono text-[12px]">{{ file.filename }}</span>
-                    <span class="stx-mono text-[10.5px]" [style.color]="'var(--stx-muted-2)'">{{
-                      humanSize(file.size)
-                    }}</span>
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="15"
-                      height="15"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.9"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      [style.color]="'var(--stx-ink)'"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
-                      ></path>
-                    </svg>
-                  </button>
-                }
-              </div>
-            }
-          </article>
+          </div>
         </div>
       } @else {
         <div class="grid flex-1 place-items-center">
@@ -356,6 +408,7 @@
       [seed]="seed()"
       (closed)="closeCompose()"
       (sent)="onSent()"
+      (saved)="onDraftSaved()"
     />
   }
 </ng-container>
