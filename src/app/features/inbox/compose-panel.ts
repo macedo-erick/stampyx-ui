@@ -19,20 +19,16 @@ import { MessageService } from '../../core/api/message.service';
 import type { DraftAttachment, Mailbox } from '../../shared/models';
 import { hasFormatting, inlineQuillFormatting } from './quill-html';
 
-// They differ only in the seed: a reply knows the recipient and threads; a forward starts empty.
 export interface ComposeSeed {
   readonly to: string[];
   readonly cc?: string[];
   readonly subject: string;
   readonly inReplyTo: string | null;
   readonly body: string;
-  // A draft reopens with the markup it was written with, not a flattened copy of it.
   readonly html?: string | null;
-  // Saving or sending removes the draft it was opened from, rather than leaving half-written copies.
   readonly replacesDraftId?: string;
 }
 
-// Mirrors MAIL_MAX_ATTACHMENT_BYTES; the server enforces it either way, this only fills the bar first.
 const MAX_ATTACHMENT_BYTES = 26_214_400;
 
 @Component({
@@ -41,7 +37,6 @@ const MAX_ATTACHMENT_BYTES = 26_214_400;
   templateUrl: './compose-panel.html',
   styleUrl: './compose-panel.css',
   host: {
-    // Global: Quill builds the toolbar at runtime, so its rules live in styles.css.
     class: 'stx-compose',
     '[class.is-minimized]': 'minimized()',
     '[class.is-formatting]': 'formatOpen()',
@@ -54,15 +49,10 @@ const MAX_ATTACHMENT_BYTES = 26_214_400;
 export class ComposePanel {
   readonly mailboxId = input.required<string>();
   readonly senders = input<readonly Mailbox[]>([]);
-  // Set when the composer was opened from Reply: the fields arrive filled in.
   readonly seed = input<ComposeSeed | null>(null);
   readonly closed = output<void>();
   readonly sent = output<void>();
-  // Distinct from `closed`: a saved draft lands under a new id, so the list must be refetched
-  // or the dead row stays on screen and asks for a message that no longer exists.
   readonly saved = output<void>();
-  // Also distinct from `closed`: discarding deletes the draft the composer was opened from,
-  // so the list behind it is one row lighter and the folder counts have moved.
   readonly discarded = output<void>();
 
   private readonly messages = inject(MessageService);
@@ -77,8 +67,6 @@ export class ComposePanel {
   protected readonly bcc = signal<string[]>([]);
   protected readonly showCc = signal(false);
   protected readonly showBcc = signal(false);
-  // Nine controls at a 44px target exceed a phone's width, so below the breakpoint the
-  // toolbar is closed until asked for rather than scrolling sideways.
   protected readonly formatOpen = signal(false);
   protected readonly subject = signal('');
   protected readonly attachments = signal<DraftAttachment[]>([]);
@@ -90,15 +78,10 @@ export class ComposePanel {
   protected readonly dragging = signal(false);
   private readonly prefilled = signal(false);
 
-  // Written once, when the composer is seeded. Bound one way into the editor on purpose:
-  // writing back on every keystroke would hand Quill a new value mid-edit and move the
-  // caret to the end of it.
   protected readonly seedHtml = signal('');
   private readonly bodyHtml = signal('');
   private readonly bodyText = signal('');
 
-  // The send goes out as mailboxId, so the header has to name that mailbox. Taking the first
-  // sender on the account showed one address while the message left from another.
   protected readonly from = computed(
     () => this.senders().find((row) => row.id === this.mailboxId())?.address ?? '',
   );
@@ -107,9 +90,6 @@ export class ComposePanel {
   private readonly replaces = signal<string | null>(null);
 
   constructor() {
-    // Runs once on open; after that the fields belong to whoever is typing. No wait for the
-    // editor any more: p-editor keeps a value written before Quill exists and applies it on
-    // init, where the old element check dropped the body and opened a forward empty.
     effect(() => {
       const context = this.seed();
 
@@ -125,8 +105,6 @@ export class ComposePanel {
       this.inReplyTo.set(context.inReplyTo);
       this.replaces.set(context.replacesDraftId ?? null);
 
-      // A draft reopens with the markup it was written with. Sanitized server-side on the
-      // way out of IMAP, so what comes back is safe to mount.
       const html =
         context.html != null && context.html !== ''
           ? context.html
@@ -181,7 +159,6 @@ export class ComposePanel {
       return;
     }
 
-    // Backspace on an empty field takes the previous chip, the way every mail client does.
     if (event.key === 'Backspace' && input.value === '') {
       this.bucket(list).update((current) => current.slice(0, -1));
     }
@@ -195,8 +172,6 @@ export class ComposePanel {
     return address.slice(0, 2).toUpperCase();
   }
 
-  // Quill owns the editing surface, so the panel only has to keep what was typed. Both
-  // shapes are kept: the message carries a plain-text part as well as an HTML one.
   protected onBodyChange(event: EditorTextChangeEvent): void {
     this.bodyHtml.set(event.htmlValue ?? '');
     this.bodyText.set(event.textValue);
@@ -268,8 +243,6 @@ export class ComposePanel {
 
     const raw = this.bodyHtml();
     const text = this.bodyText();
-    // Quill leaves alignment and indent as its own CSS classes, which mean nothing in the
-    // recipient's client, so they are rewritten as inline styles on the way out.
     const html = inlineQuillFormatting(raw);
 
     this.sending.set(true);
@@ -281,8 +254,6 @@ export class ComposePanel {
         bcc: this.bcc(),
         subject: this.subject(),
         text,
-        // Only when the body actually carries markup: a plain note should stay plain, not
-        // arrive wrapped in the <p> Quill puts around every line.
         ...(hasFormatting(raw) ? { html } : {}),
         ...(this.inReplyTo() === null ? {} : { inReplyTo: this.inReplyTo() as string }),
         ...(this.replaces() === null ? {} : { replacesDraftId: this.replaces() as string }),
@@ -301,8 +272,6 @@ export class ComposePanel {
       });
   }
 
-  // A draft never reaches the MTA: it is filed in Drafts so it can be picked up from any
-  // client. Saving replaces the previous one, so it comes back with a new id.
   protected saveDraft(): void {
     if (this.savingDraft()) {
       return;
@@ -341,10 +310,6 @@ export class ComposePanel {
     this.closed.emit();
   }
 
-  // Discarding is not the same as closing. A composer opened from Drafts left that draft
-  // sitting there, and since saving and sending are the only things that pass
-  // `replacesDraftId`, sending the message was the only way to be rid of one. It goes where
-  // any deleted message goes - Trash - so a mis-click is still recoverable.
   protected discard(): void {
     if (this.discarding()) {
       return;
@@ -352,7 +317,6 @@ export class ComposePanel {
 
     const draftId = this.replaces();
 
-    // Nothing was ever filed: a composer that is not backed by a draft has nothing to delete.
     if (draftId === null) {
       this.closed.emit();
 
@@ -370,8 +334,6 @@ export class ComposePanel {
         });
         this.discarded.emit();
       },
-      // The draft survived, so the panel stays open with the text still in it rather than
-      // closing over writing the user can no longer get back to.
       error: () => {
         this.discarding.set(false);
         this.toast.add({
@@ -420,9 +382,6 @@ export class ComposePanel {
   }
 }
 
-// The commands whose pressed state the toolbar reflects.
-// A forward seeds the body with the quoted original as plain text. Quill takes HTML, and
-// handing it raw text would render the quote's own angle brackets as markup.
 function textToHtml(text: string): string {
   return text
     .split('\n')

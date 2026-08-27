@@ -4,13 +4,11 @@
 }
 
 @media (max-width: 899px) {
-  /* 208px of sidebar plus 396px of list left nothing for the reader on a 390px phone. */
   .list-pane {
     width: 100%;
     border-right: 0;
   }
 
-  /* Covers the list. Absolute, not fixed, so the top bar stays put above it. */
   .reader-pane {
     position: absolute;
     inset: 0;
@@ -59,8 +57,6 @@
     display: none;
   }
 
-  /* Back, reply, forward, archive and delete at desktop sizes came to more than a 390px
-     bar holds, and the two icons on the right were the ones that fell off it. */
   .reader-bar {
     padding-inline: 12px;
     gap: 8px;
@@ -72,8 +68,6 @@
     font-size: 12.5px;
   }
 
-  /* Last resort for a locale with longer words than pt-BR: the label gives way before
-     anything leaves the bar. */
   .reader-bar .pill-label {
     min-width: 0;
     overflow: hidden;

@@ -4,7 +4,6 @@ import { inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { MailboxSessionService } from './mailbox-session.service';
 
-// Anchored to the API origin: the token must never travel to a third-party host.
 export const stampyxTokenInterceptor: HttpInterceptorFn = (request, next) => {
   const token = inject(MailboxSessionService).token();
 

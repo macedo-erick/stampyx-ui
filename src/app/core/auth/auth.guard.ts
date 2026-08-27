@@ -4,7 +4,6 @@ import Keycloak from 'keycloak-js';
 
 import { MailboxSessionService } from './mailbox-session.service';
 
-// A mailbox user has no Keycloak identity, so the Keycloak login would strand them: stampyx form instead.
 export const authGuard: CanActivateFn = (_route, state) => {
   const keycloak = inject(Keycloak);
   const mailbox = inject(MailboxSessionService);

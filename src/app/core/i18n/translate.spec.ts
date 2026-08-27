@@ -24,7 +24,6 @@ describe('injectTranslate', () => {
     expect(translate('inbox.newMail', { sender: 'a@b.test' })).toBe('New message from a@b.test');
   });
 
-  // Reading it in a template re-runs on a language switch, which a plain call would not do.
   it('re-reads when the language changes, so a switch repaints the text', () => {
     const before = translate('titles.inbox');
 

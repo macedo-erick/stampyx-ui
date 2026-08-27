@@ -5,7 +5,6 @@ import type { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type { DraftAttachment } from '../../shared/models';
 
-// Uploaded before the message exists: a draft on the mailbox until the send binds a Message-ID.
 @Service()
 export class AttachmentService {
   private readonly http = inject(HttpClient);

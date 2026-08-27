@@ -22,8 +22,6 @@
 
 <p-toast position="bottom-right" />
 
-<!-- ConfirmationService only posts an event: without this rendered, every confirm() was a silent
-     no-op. Headless, so PrimeNG keeps the mask, focus trap and Escape while the panel stays ours. -->
 <p-confirmdialog [style]="{ width: '25rem' }">
   <ng-template #headless let-confirmation let-onAccept="onAccept" let-onReject="onReject">
     <div class="stx-card stx-confirm" *transloco="let t">

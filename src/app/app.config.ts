@@ -28,7 +28,6 @@ export const appConfig: ApplicationConfig = {
     provideKeycloakAuth(),
     keycloakBearerTokenConfig,
     provideHttpClient(
-      // stampyxTokenInterceptor first: a mailbox session has no Keycloak token to add.
       withInterceptors([stampyxTokenInterceptor, includeBearerTokenInterceptor, errorInterceptor]),
     ),
     providePrimeNG({
