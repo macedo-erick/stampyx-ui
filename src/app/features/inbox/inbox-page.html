@@ -130,8 +130,6 @@
           [style.background]="'var(--stx-surface)'"
         >
           <div class="flex items-center gap-2">
-            <!-- The way back to the list once the reader covers it; laid out only under the
-                 breakpoint, where the two panes stop being side by side. -->
             <button
               type="button"
               class="back-button"
@@ -428,9 +426,6 @@
     </section>
   </div>
 
-  <!-- Compose leaves the drawer under the breakpoint: burying the panel's primary action
-       behind a hamburger would be a downgrade, so it becomes a FAB on the list instead.
-       Hidden while a message or the composer is open, where it would sit over the content. -->
   <button
     type="button"
     class="compose-fab"

@@ -41,8 +41,7 @@ const MAX_ATTACHMENT_BYTES = 26_214_400;
   templateUrl: './compose-panel.html',
   styleUrl: './compose-panel.css',
   host: {
-    // Global, not scoped: Quill builds the toolbar at runtime, so the emulated encapsulation
-    // attribute never reaches it and the mobile rules for it have to live in styles.css.
+    // Global: Quill builds the toolbar at runtime, so its rules live in styles.css.
     class: 'stx-compose',
     '[class.is-minimized]': 'minimized()',
     '[class.is-formatting]': 'formatOpen()',
@@ -78,9 +77,8 @@ export class ComposePanel {
   protected readonly bcc = signal<string[]>([]);
   protected readonly showCc = signal(false);
   protected readonly showBcc = signal(false);
-  // Nine format controls at a 44px target come to more than a phone's width, so under the
-  // breakpoint the toolbar is closed until asked for rather than scrolling sideways with
-  // half of it out of view. Above the breakpoint it is always laid out and this is unread.
+  // Nine controls at a 44px target exceed a phone's width, so below the breakpoint the
+  // toolbar is closed until asked for rather than scrolling sideways.
   protected readonly formatOpen = signal(false);
   protected readonly subject = signal('');
   protected readonly attachments = signal<DraftAttachment[]>([]);

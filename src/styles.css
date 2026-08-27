@@ -570,8 +570,7 @@ body {
   margin-top: 0;
 }
 
-/* Backs the sidebar when it is a drawer. Above the breakpoint the drawer never opens, so the
-   scrim is display:none there rather than merely transparent. */
+/* Backs the sidebar when it is a drawer. */
 .stx-scrim {
   display: none;
   position: fixed;
@@ -597,17 +596,13 @@ body {
   }
 }
 
-/* Quill builds its toolbar at runtime, so these cannot live in compose-panel.css - the
-   component's encapsulation attribute never lands on the nodes. Scoped to the composer's
-   host class so no other editor is affected. */
+/* Global because Quill builds its toolbar at runtime, out of reach of component styles. */
 @media (max-width: 899px) {
   .stx-compose .p-editor .p-editor-toolbar,
   .stx-compose .p-editor .ql-toolbar {
     display: none;
   }
 
-  /* Opened from the Aa button in the footer. Wraps onto as many 44px rows as it needs
-     instead of scrolling sideways and hiding half the controls. */
   .stx-compose.is-formatting .p-editor .p-editor-toolbar,
   .stx-compose.is-formatting .p-editor .ql-toolbar {
     display: flex;
@@ -623,10 +618,7 @@ body {
     height: 44px;
   }
 
-  /* The body absorbs the extra height on a phone, not the chrome. The template pins the
-     content to 160px inline - right for the anchored drawer, wrong for a full-screen sheet -
-     and an inline style is only reachable with !important. The .body class raises this over
-     the component's own rule for the same element. */
+  /* The template pins the content to 160px inline; only !important reaches that. */
   .stx-compose .p-editor.body {
     display: flex;
     flex: 1;
@@ -645,11 +637,8 @@ body {
   }
 }
 
-/* Layout patterns the management screens share. Unlayered, so they win over the Tailwind
-   utilities in the template without needing !important. */
+/* Unlayered, so these win over the Tailwind utilities in the templates. */
 @media (max-width: 899px) {
-  /* A list column beside a detail column is the same shape that broke the inbox: below the
-     breakpoint the second one drops underneath instead of being squeezed beside. */
   .stx-split {
     flex-direction: column;
   }
@@ -659,8 +648,6 @@ body {
     max-width: none;
   }
 
-  /* justify-between puts a label and its control on one line, which at 390px leaves the
-     control a sliver. The label sits above it instead. */
   .stx-field-row {
     flex-direction: column;
     align-items: stretch;

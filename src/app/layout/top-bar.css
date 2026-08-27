@@ -122,8 +122,7 @@
   color: var(--stx-text);
 }
 
-/* One panel at a time. Above this the shell keeps its three columns; below it the sidebar
-   becomes an overlay drawer, so the bar has to grow a button that opens it. */
+/* Below the breakpoint the sidebar is a drawer, so the bar grows a button that opens it. */
 @media (max-width: 899px) {
   :host {
     gap: 4px;
@@ -135,8 +134,7 @@
     display: grid;
   }
 
-  /* The field is what pushed the actions off-screen at 390px, so it is an icon until asked
-     for, and takes the whole bar once it is. */
+  /* A flex:1 field is what pushed the actions off-screen at 390px. */
   .search {
     display: none;
   }
@@ -158,7 +156,7 @@
     display: none;
   }
 
-  /* Both live in the drawer's footer down here, where there is room for a label. */
+  /* Both live in the drawer's footer down here. */
   .desktop-only {
     display: none;
   }
@@ -169,8 +167,6 @@
     height: 36px;
   }
 
-  /* The open field takes the bar; the brand cannot be reached from it with a sibling
-     selector, so the host carries the state instead. */
   :host(.is-searching) .brand {
     display: none;
   }

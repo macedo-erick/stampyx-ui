@@ -11,8 +11,7 @@ import { MobileNav } from './mobile-nav.service';
   imports: [TranslocoDirective, RouterLink],
   templateUrl: './top-bar.html',
   styleUrl: './top-bar.css',
-  // The brand sits before the field in the DOM, so the open field cannot reach it with a
-  // sibling selector; the state goes on the host and the CSS reads it from there.
+  // The brand precedes the field, so no sibling selector reaches it; the host carries it.
   host: { '[class.is-searching]': 'searchOpen()' },
 })
 export class TopBar {
@@ -20,6 +19,5 @@ export class TopBar {
   protected readonly auth = inject(AuthService);
   protected readonly nav = inject(MobileNav);
 
-  // Presentational only, and only under the breakpoint: the field is always laid out above it.
   protected readonly searchOpen = signal(false);
 }

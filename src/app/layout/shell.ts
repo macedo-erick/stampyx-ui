@@ -24,8 +24,7 @@ export class Shell {
   private readonly router = inject(Router);
 
   constructor() {
-    // Every drawer row is a navigation, so closing here covers the folder buttons and the
-    // routerLinks alike rather than each of them remembering to.
+    // Every drawer row navigates, so this covers the folder buttons and routerLinks alike.
     this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.nav.close();

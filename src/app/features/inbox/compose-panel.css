@@ -356,7 +356,7 @@
   color: #fff;
 }
 
-/* A 476px drawer pinned to a corner has nowhere to go on a phone, so it takes the screen. */
+/* A 476px corner drawer has nowhere to go on a phone. */
 @media (max-width: 899px) {
   :host {
     position: fixed;

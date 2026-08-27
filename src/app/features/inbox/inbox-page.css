@@ -1,22 +1,16 @@
-/* Chrome that only exists under the layout's breakpoint. Declared here rather than in the
-   template's utility classes because both are display:none above it, and a hidden control
-   should not carry the styling that positions it. */
 .back-button,
 .compose-fab {
   display: none;
 }
 
 @media (max-width: 899px) {
-  /* 208px of sidebar plus 396px of list came to 604px before the reader was given a pixel,
-     which is why it was off-screen on a 390px phone. The sidebar leaves the flow (it is a
-     drawer down here) and the list takes what is left. */
+  /* 208px of sidebar plus 396px of list left nothing for the reader on a 390px phone. */
   .list-pane {
     width: 100%;
     border-right: 0;
   }
 
-  /* The reader stops being the list's neighbour and covers it. Absolute against the page
-     host, not fixed, so the top bar stays put and this sits under it rather than over it. */
+  /* Covers the list. Absolute, not fixed, so the top bar stays put above it. */
   .reader-pane {
     position: absolute;
     inset: 0;

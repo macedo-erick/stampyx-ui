@@ -1,13 +1,7 @@
 import { Service, signal } from '@angular/core';
 
-/**
- * The drawer's open state. The top bar's hamburger opens it, the sidebar's own rows and the
- * scrim close it, and they are siblings under the shell rather than parent and child, so the
- * flag lives here instead of being threaded through both.
- *
- * Only meaningful under the layout's mobile breakpoint: above it the sidebar is a static
- * column and the drawer chrome is display:none, so the flag is simply never read.
- */
+// The drawer's open state. The top bar opens it and the sidebar closes it, and the two are
+// siblings under the shell, so the flag lives here rather than being threaded through both.
 @Service()
 export class MobileNav {
   readonly open = signal(false);

@@ -317,9 +317,7 @@ export class InboxPage {
     });
   }
 
-  // Under the layout's breakpoint the reader covers the list rather than sitting beside it,
-  // so closing the message is how you get back to the list. Above it this is a no-op the
-  // template never offers.
+  // Below the breakpoint the reader covers the list, so closing is how you get back to it.
   protected closeMessage(): void {
     this.clearSelection();
   }
@@ -400,8 +398,8 @@ export class InboxPage {
     return address.slice(0, 2).toUpperCase();
   }
 
-  // Intl's `undefined` locale means the browser's, not the app's, so the dates stayed in
-  // en-US however the panel was set. Reading the signal also re-renders them on a switch.
+  // Intl's `undefined` locale is the browser's, not the app's, so dates stayed in en-US.
+  // Reading the signal also re-renders them when the language changes.
   protected time(iso: string): string {
     const at = new Date(iso);
 
