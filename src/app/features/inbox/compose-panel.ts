@@ -9,30 +9,15 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { MessageService as ToastService } from 'primeng/api';
+import { Editor, type EditorTextChangeEvent } from 'primeng/editor';
 
 import { AttachmentService } from '../../core/api/attachment.service';
 import { MessageService } from '../../core/api/message.service';
 import type { DraftAttachment, Mailbox } from '../../shared/models';
-
-// What the toolbar can hand to execCommand. Deprecated on paper, but it is still the only
-// contenteditable formatting API every browser implements, and a real editor engine is a
-// dependency this panel does not need.
-type InlineCommand =
-  | 'bold'
-  | 'italic'
-  | 'underline'
-  | 'strikeThrough'
-  | 'insertUnorderedList'
-  | 'insertOrderedList'
-  | 'justifyLeft'
-  | 'justifyCenter'
-  | 'justifyRight'
-  | 'outdent'
-  | 'indent';
-
-type BlockTag = 'p' | 'h1' | 'h2' | 'h3' | 'blockquote' | 'pre';
+import { hasFormatting, inlineQuillFormatting } from './quill-html';
 
 // Reply and Forward differ only in what they seed: a reply knows the recipient and threads
 // onto the original, a forward starts with an empty To and carries the text along.
@@ -49,7 +34,7 @@ const MAX_ATTACHMENT_BYTES = 26_214_400;
 
 @Component({
   selector: 'stampyx-compose-panel',
-  imports: [TranslocoDirective],
+  imports: [TranslocoDirective, FormsModule, Editor],
   templateUrl: './compose-panel.html',
   styleUrl: './compose-panel.css',
   host: {
@@ -73,7 +58,6 @@ export class ComposePanel {
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
 
-  private readonly editor = viewChild<ElementRef<HTMLElement>>('editor');
   private readonly picker = viewChild<ElementRef<HTMLInputElement>>('picker');
 
   protected readonly to = signal<string[]>([]);
@@ -89,6 +73,13 @@ export class ComposePanel {
   protected readonly minimized = signal(false);
   protected readonly dragging = signal(false);
   private readonly prefilled = signal(false);
+
+  // Written once, when the composer is seeded from Reply or Forward. Bound one way into the
+  // editor on purpose: writing back on every keystroke would hand Quill a new value mid-edit
+  // and move the caret to the end of it.
+  protected readonly seedHtml = signal('');
+  private readonly bodyHtml = signal('');
+  private readonly bodyText = signal('');
 
   // The send goes out as mailboxId, so the header has to name that mailbox. Taking the first
   // sender on the account showed one address while the message left from another.
@@ -112,10 +103,12 @@ export class ComposePanel {
       this.subject.set(context.subject);
       this.inReplyTo.set(context.inReplyTo);
 
-      const editor = this.editor()?.nativeElement;
+      if (context.body !== '') {
+        const html = textToHtml(context.body);
 
-      if (editor !== undefined && context.body !== '') {
-        editor.innerText = context.body;
+        this.seedHtml.set(html);
+        this.bodyHtml.set(html);
+        this.bodyText.set(context.body);
       }
     });
   }
@@ -173,36 +166,11 @@ export class ComposePanel {
     return address.slice(0, 2).toUpperCase();
   }
 
-  protected format(command: InlineCommand): void {
-    this.editor()?.nativeElement.focus();
-    document.execCommand(command);
-  }
-
-  // formatBlock wants the tag in angle brackets: the bare name works in Chrome and is
-  // ignored by Firefox, which is how headings silently did nothing there.
-  protected block(tag: BlockTag): void {
-    this.editor()?.nativeElement.focus();
-    document.execCommand('formatBlock', false, `<${tag}>`);
-  }
-
-  protected addLink(): void {
-    const href = window.prompt(this.transloco.translate('compose.linkPrompt'));
-
-    if (href === null || href.trim() === '') {
-      return;
-    }
-
-    this.editor()?.nativeElement.focus();
-    // Bare hostnames become relative URLs, which resolve against the panel rather than the
-    // site the writer meant.
-    document.execCommand('createLink', false, withScheme(href.trim()));
-  }
-
-  // execCommand leaves the block wrapper behind, so a cleared heading stays a heading.
-  protected clearFormatting(): void {
-    this.editor()?.nativeElement.focus();
-    document.execCommand('removeFormat');
-    document.execCommand('formatBlock', false, '<p>');
+  // Quill owns the editing surface now, so the panel only has to keep what it typed. Both
+  // shapes are kept: the message carries a plain-text part as well as the HTML one.
+  protected onBodyChange(event: EditorTextChangeEvent): void {
+    this.bodyHtml.set(event.htmlValue ?? '');
+    this.bodyText.set(event.textValue);
   }
 
   protected choose(): void {
@@ -269,9 +237,11 @@ export class ComposePanel {
       return;
     }
 
-    const element = this.editor()?.nativeElement;
-    const html = element?.innerHTML ?? '';
-    const text = element?.innerText ?? '';
+    const raw = this.bodyHtml();
+    const text = this.bodyText();
+    // Quill's class-based formatting means nothing in the recipient's client, so it is
+    // rewritten as inline styles on the way out rather than stored and hoped for.
+    const html = inlineQuillFormatting(raw);
 
     this.sending.set(true);
 
@@ -282,8 +252,9 @@ export class ComposePanel {
         bcc: this.bcc(),
         subject: this.subject(),
         text,
-        // Only when the body actually carries markup: a plain note should stay plain.
-        ...(html.includes('<') ? { html } : {}),
+        // Only when the body actually carries markup: a plain note should stay plain, not
+        // arrive wrapped in the <p> Quill puts around every line.
+        ...(hasFormatting(raw) ? { html } : {}),
         ...(this.inReplyTo() === null ? {} : { inReplyTo: this.inReplyTo() as string }),
         attachmentIds: this.attachments().map((row) => row.id),
       })
@@ -307,8 +278,8 @@ export class ComposePanel {
       return;
     }
 
-    const element = this.editor()?.nativeElement;
-    const html = element?.innerHTML ?? '';
+    const raw = this.bodyHtml();
+    const html = inlineQuillFormatting(raw);
 
     this.savingDraft.set(true);
 
@@ -318,8 +289,8 @@ export class ComposePanel {
         cc: this.cc(),
         bcc: this.bcc(),
         subject: this.subject(),
-        text: element?.innerText ?? '',
-        ...(html.includes('<') ? { html } : {}),
+        text: this.bodyText(),
+        ...(hasFormatting(raw) ? { html } : {}),
         attachmentIds: this.attachments().map((row) => row.id),
       })
       .subscribe({
@@ -377,6 +348,19 @@ export class ComposePanel {
   }
 }
 
-function withScheme(href: string): string {
-  return /^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//') ? href : `https://${href}`;
+// A forward seeds the body with the quoted original as plain text. Quill takes HTML, and
+// handing it raw text would render the quote's own angle brackets as markup.
+function textToHtml(text: string): string {
+  return text
+    .split('\n')
+    .map((line) => `<p>${escapeHtml(line)}</p>`)
+    .join('');
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 }

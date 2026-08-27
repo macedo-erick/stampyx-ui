@@ -29,7 +29,10 @@
             ],
             "security": {
               "allowedHosts": []
-            }
+            },
+            "allowedCommonJsDependencies": [
+              "quill-delta"
+            ]
           },
           "configurations": {
             "production": {

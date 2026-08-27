@@ -5,6 +5,11 @@
 @import 'tailwindcss/utilities.css' layer(utilities);
 @import 'primeicons/primeicons.css';
 
+/* PrimeNG's p-editor is a Quill wrapper and ships no theme of its own. Snow is the toolbar
+   and, more to the point, the link tooltip. Global rather than component-scoped: Quill builds
+   its DOM at runtime, so Angular's emulated encapsulation attributes never reach it. */
+@import 'quill/dist/quill.snow.css';
+
 @plugin 'tailwindcss-primeui';
 @custom-variant dark (&:where(.app-dark, .app-dark *));
 
@@ -321,4 +326,139 @@ body {
   max-width: 100%;
   overflow-x: auto;
   border-collapse: collapse;
+}
+
+/* Quill in the panel's clothes. Its own chrome is a light-themed 2017 default; these pull it
+   onto the app tokens so it follows the theme switch like everything else. */
+.ql-toolbar.ql-snow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  border: 0;
+  border-bottom: 1px solid var(--stx-surface-2);
+  font-family: inherit;
+}
+
+.ql-container.ql-snow {
+  border: 0;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.ql-snow .ql-editor {
+  padding: 15px 16px;
+  line-height: 1.65;
+  color: var(--stx-text);
+}
+
+.ql-snow .ql-editor.ql-blank::before {
+  left: 16px;
+  right: 16px;
+  color: var(--stx-muted-2);
+  font-style: normal;
+}
+
+/* Quill draws its icons as strokes and fills on inline SVG, hard-coded to near-black. In
+   dark mode that is an invisible toolbar. */
+.ql-snow .ql-stroke {
+  stroke: var(--stx-muted);
+}
+
+.ql-snow .ql-fill,
+.ql-snow .ql-stroke.ql-fill {
+  fill: var(--stx-muted);
+}
+
+.ql-snow .ql-picker {
+  color: var(--stx-muted);
+}
+
+.ql-snow button:hover .ql-stroke,
+.ql-snow button:focus .ql-stroke,
+.ql-snow button.ql-active .ql-stroke,
+.ql-snow .ql-picker-label:hover .ql-stroke,
+.ql-snow .ql-picker-label.ql-active .ql-stroke {
+  stroke: var(--stx-ink);
+}
+
+.ql-snow button:hover .ql-fill,
+.ql-snow button:focus .ql-fill,
+.ql-snow button.ql-active .ql-fill {
+  fill: var(--stx-ink);
+}
+
+.ql-snow button {
+  border-radius: 8px;
+}
+
+.ql-snow button:hover,
+.ql-snow button.ql-active {
+  background: var(--stx-surface-2);
+}
+
+.ql-snow .ql-picker-options {
+  background: var(--stx-surface);
+  border-color: var(--stx-line);
+  border-radius: 10px;
+}
+
+/* The link editor. This is the whole reason the panel moved off window.prompt, so it has to
+   be legible in both themes rather than the theme Quill assumed. */
+.ql-snow .ql-tooltip {
+  z-index: 50;
+  padding: 7px 9px;
+  border: 1px solid var(--stx-line);
+  border-radius: 10px;
+  background: var(--stx-surface);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 22%);
+  color: var(--stx-text);
+}
+
+.ql-snow .ql-tooltip input[type='text'] {
+  padding: 4px 7px;
+  border: 1px solid var(--stx-line);
+  border-radius: 7px;
+  background: var(--stx-bg);
+  color: var(--stx-text);
+  font-family: var(--stx-mono);
+  font-size: 12px;
+}
+
+.ql-snow .ql-tooltip a {
+  color: var(--stx-ink);
+}
+
+/* Quill zeroes the margins on every block so its own editor stays compact, which leaves
+   headings and lists indistinguishable from body text while you are writing them. */
+.ql-snow .ql-editor h1,
+.ql-snow .ql-editor h2,
+.ql-snow .ql-editor h3 {
+  margin: 1.1em 0 0.45em;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.ql-snow .ql-editor h1 {
+  font-size: 1.5em;
+}
+
+.ql-snow .ql-editor h2 {
+  font-size: 1.28em;
+}
+
+.ql-snow .ql-editor h3 {
+  font-size: 1.1em;
+}
+
+.ql-snow .ql-editor blockquote {
+  margin: 0.6em 0;
+  padding-left: 0.9em;
+  border-left: 3px solid var(--stx-line);
+  color: var(--stx-muted);
+}
+
+.ql-snow .ql-editor > :first-child {
+  margin-top: 0;
 }
