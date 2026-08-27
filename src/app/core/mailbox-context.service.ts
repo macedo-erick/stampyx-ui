@@ -45,6 +45,10 @@ export class MailboxContext {
     () => this.folders().find((row) => row.specialUse === '\\Drafts')?.path ?? null,
   );
 
+  readonly trashPath = computed(
+    () => this.folders().find((row) => row.specialUse === '\\Trash')?.path ?? null,
+  );
+
   readonly sentPath = computed(
     () => this.folders().find((row) => row.specialUse === '\\Sent')?.path ?? null,
   );
