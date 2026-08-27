@@ -286,10 +286,66 @@
 
                 @if (isExpanded(row)) {
                   <div class="flex flex-col gap-4 px-5 pb-5">
+                    <div class="flex items-center justify-between gap-3">
+                      <span class="stx-mono text-[11px]" [style.color]="'var(--stx-muted-2)'">{{
+                        fullDate(row.receivedAt)
+                      }}</span>
+                      <button
+                        type="button"
+                        class="rounded-full px-2.5 py-1 text-[11px]"
+                        [style.color]="'var(--stx-muted)'"
+                        [style.background]="
+                          showsDetails(row) ? 'var(--stx-surface-2)' : 'transparent'
+                        "
+                        (click)="toggleDetails(row)"
+                        [attr.aria-expanded]="showsDetails(row)"
+                      >
+                        {{ t('inbox.details') }}
+                      </button>
+                    </div>
+
+                    @if (showsDetails(row)) {
+                      <dl
+                        class="grid gap-x-4 gap-y-1.5 rounded-xl border px-4 py-3 text-[11.5px]"
+                        style="grid-template-columns: auto minmax(0, 1fr)"
+                        [style.borderColor]="'var(--stx-line)'"
+                        [style.background]="'var(--stx-surface-2)'"
+                      >
+                        <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.from') }}</dt>
+                        <dd class="stx-mono break-all">{{ row.sender }}</dd>
+
+                        <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.toPrefix') }}</dt>
+                        <dd class="stx-mono break-all">
+                          {{ row.to.join(', ') || t('inbox.noRecipients') }}
+                        </dd>
+
+                        @if (row.cc.length > 0) {
+                          <dt [style.color]="'var(--stx-muted-2)'">{{ t('compose.cc') }}</dt>
+                          <dd class="stx-mono break-all">{{ row.cc.join(', ') }}</dd>
+                        }
+
+                        <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.date') }}</dt>
+                        <dd>{{ fullDate(row.receivedAt) }}</dd>
+
+                        <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.folder') }}</dt>
+                        <dd>{{ row.folder }}</dd>
+
+                        @if (row.spamScore !== null) {
+                          <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.spamScore') }}</dt>
+                          <dd class="stx-mono">{{ row.spamScore }}</dd>
+                        }
+
+                        <dt [style.color]="'var(--stx-muted-2)'">{{ t('inbox.messageId') }}</dt>
+                        <dd class="stx-mono break-all" [style.color]="'var(--stx-muted)'">
+                          {{ row.messageId }}
+                        </dd>
+                      </dl>
+                    }
+
                     <div class="h-px" [style.background]="'var(--stx-line)'"></div>
 
                     @if (row.html) {
-                      <div class="text-sm leading-relaxed" [innerHTML]="row.html"></div>
+                      <div class="stx-prose text-sm leading-relaxed" [innerHTML]="row.html"></div>
                     } @else {
                       <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ row.text }}</p>
                     }
@@ -353,6 +409,7 @@
       (closed)="closeCompose()"
       (sent)="onSent()"
       (saved)="onDraftSaved()"
+      (discarded)="onDraftDiscarded()"
     />
   }
 </ng-container>

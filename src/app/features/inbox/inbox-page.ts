@@ -37,6 +37,10 @@ export class InboxPage {
   // The whole conversation with bodies: the pane stacks the exchange rather than one message.
   protected readonly conversation = signal<MessageDetail[]>([]);
   protected readonly expanded = signal<ReadonlySet<string>>(new Set());
+  // The full envelope - every recipient, the Message-ID, the folder - is reference material
+  // rather than what a reader opens a message for, so it starts collapsed. Keyed by message
+  // for the same reason `expanded` is: the pane shows a conversation, not one message.
+  protected readonly detailsOpen = signal<ReadonlySet<string>>(new Set());
 
   // A Sent or Drafts list shows who the message went to; everywhere else, who wrote it.
   protected readonly showsRecipient = computed(
@@ -220,6 +224,22 @@ export class InboxPage {
     return this.expanded().has(message.id);
   }
 
+  protected toggleDetails(message: MessageDetail): void {
+    this.detailsOpen.update((current) => {
+      const next = new Set(current);
+
+      if (!next.delete(message.id)) {
+        next.add(message.id);
+      }
+
+      return next;
+    });
+  }
+
+  protected showsDetails(message: MessageDetail): boolean {
+    return this.detailsOpen().has(message.id);
+  }
+
   // The oldest message names the conversation; replies only stack a prefix on it.
   protected readonly threadSubject = computed(
     () => this.conversation()[0]?.subject ?? this.selected()?.subject ?? '',
@@ -268,6 +288,14 @@ export class InboxPage {
   // Saving rewrites the draft under a new id, so the row on screen points at nothing until a
   // refetch. Drafts counts what it holds, so the badge moves with it.
   protected onDraftSaved(): void {
+    this.closeCompose();
+    this.refresh();
+    this.context.reloadFolders();
+  }
+
+  // Discarding deleted the draft, so the row it was opened from is gone and Drafts counts
+  // one fewer. Same reload as a save, for the same reason.
+  protected onDraftDiscarded(): void {
     this.closeCompose();
     this.refresh();
     this.context.reloadFolders();
@@ -359,6 +387,16 @@ export class InboxPage {
     const at = new Date(iso);
 
     return at.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  }
+
+  protected fullDate(iso: string): string {
+    return new Date(iso).toLocaleString(undefined, {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 
   protected dayLabel(key: string): string {

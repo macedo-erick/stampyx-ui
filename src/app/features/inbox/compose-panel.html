@@ -191,210 +191,82 @@
     />
   </div>
 
-  <div class="toolbar">
-    <button
-      type="button"
-      [class.is-active]="isActive('bold')"
-      (click)="format('bold')"
-      [attr.aria-label]="t('compose.bold')"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        width="14"
-        height="14"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M6 4h8a4 4 0 0 1 0 8H6zM6 12h9a4 4 0 0 1 0 8H6z"></path>
-      </svg>
-    </button>
-    <button
-      type="button"
-      [class.is-active]="isActive('italic')"
-      (click)="format('italic')"
-      [attr.aria-label]="t('compose.italic')"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        width="14"
-        height="14"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-      >
-        <path d="M19 4h-9M14 20H5M15 4 9 20"></path>
-      </svg>
-    </button>
-    <button
-      type="button"
-      [class.is-active]="isActive('underline')"
-      (click)="format('underline')"
-      [attr.aria-label]="t('compose.underline')"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        width="14"
-        height="14"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-      >
-        <path d="M6 3v7a6 6 0 0 0 12 0V3M4 21h16"></path>
-      </svg>
-    </button>
-    <button
-      type="button"
-      [class.is-active]="isActive('strikeThrough')"
-      (click)="format('strikeThrough')"
-      [attr.aria-label]="t('compose.strike')"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        width="14"
-        height="14"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-      >
-        <path
-          d="M4 12h16M16 6.5C16 5 14.2 4 12 4 9.8 4 8 5 8 6.5c0 3.5 8 2 8 5.5M8 17c0 1.7 1.8 3 4 3s4-1.1 4-2.6"
-        ></path>
-      </svg>
-    </button>
-
-    <span class="toolbar-split" aria-hidden="true"></span>
-
-    <button
-      type="button"
-      [class.is-active]="isActive('insertUnorderedList')"
-      (click)="format('insertUnorderedList')"
-      [attr.aria-label]="t('compose.bulletList')"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        width="14"
-        height="14"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-      >
-        <path d="M9 6h11M9 12h11M9 18h11"></path>
-        <circle cx="4.5" cy="6" r="1.2" fill="currentColor" stroke="none"></circle>
-        <circle cx="4.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle>
-        <circle cx="4.5" cy="18" r="1.2" fill="currentColor" stroke="none"></circle>
-      </svg>
-    </button>
-    <button
-      type="button"
-      [class.is-active]="isActive('insertOrderedList')"
-      (click)="format('insertOrderedList')"
-      [attr.aria-label]="t('compose.numberList')"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        width="14"
-        height="14"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path
-          d="M10 6h10M10 12h10M10 18h10M4 6h1v4M4 10h2M3.6 15.2c.6-.8 2-.7 2 .3 0 .8-1.6 1.3-2.1 2.5H6"
-        ></path>
-      </svg>
-    </button>
-    <button
-      type="button"
-      (click)="format('formatBlock', 'blockquote')"
-      [attr.aria-label]="t('compose.quote')"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        width="14"
-        height="14"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M4 5v14M9 8h11M9 12h11M9 16h7"></path>
-      </svg>
-    </button>
-
-    <span class="toolbar-split" aria-hidden="true"></span>
-
-    <button type="button" (click)="addLink()" [attr.aria-label]="t('compose.link')">
-      <svg
-        viewBox="0 0 24 24"
-        width="14"
-        height="14"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-      </svg>
-    </button>
-    <button type="button" (click)="format('unlink')" [attr.aria-label]="t('compose.unlink')">
-      <svg
-        viewBox="0 0 24 24"
-        width="14"
-        height="14"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M17 7l3-3M20 8l-2.5 2.5M4 20l3-3M8.5 6.5 6 4"></path>
-        <path d="M10 13a5 5 0 0 0 6.5.9M14 11a5 5 0 0 0-6.5-.9l-3 3a5 5 0 0 0 6.3 7.6"></path>
-      </svg>
-    </button>
-    <button
-      type="button"
-      (click)="format('removeFormat')"
-      [attr.aria-label]="t('compose.clearFormat')"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        width="14"
-        height="14"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M6 5h12M11 5 8 19M14 12l6 6M20 12l-6 6"></path>
-      </svg>
-    </button>
-  </div>
-
-  <div
-    #editor
+  <p-editor
     class="body"
-    contenteditable="true"
-    role="textbox"
-    aria-multiline="true"
-    [attr.aria-label]="t('compose.body')"
-    [attr.data-placeholder]="t('compose.body')"
-    (keyup)="syncFormats()"
-    (mouseup)="syncFormats()"
-    (focus)="syncFormats()"
-  ></div>
+    [ngModel]="seedHtml()"
+    (onTextChange)="onBodyChange($event)"
+    [placeholder]="t('compose.body')"
+    [style]="{ height: '160px' }"
+  >
+    <ng-template #header>
+      <span class="ql-formats">
+        <select class="ql-header" [attr.aria-label]="t('compose.paragraph')">
+          <option value="1"></option>
+          <option value="2"></option>
+          <option value="3"></option>
+          <option selected></option>
+        </select>
+      </span>
+      <span class="ql-formats">
+        <button type="button" class="ql-bold" [attr.aria-label]="t('compose.bold')"></button>
+        <button type="button" class="ql-italic" [attr.aria-label]="t('compose.italic')"></button>
+        <button
+          type="button"
+          class="ql-underline"
+          [attr.aria-label]="t('compose.underline')"
+        ></button>
+        <button
+          type="button"
+          class="ql-strike"
+          [attr.aria-label]="t('compose.strikethrough')"
+        ></button>
+      </span>
+      <span class="ql-formats">
+        <button
+          type="button"
+          class="ql-list"
+          value="bullet"
+          [attr.aria-label]="t('compose.bulletList')"
+        ></button>
+        <button
+          type="button"
+          class="ql-list"
+          value="ordered"
+          [attr.aria-label]="t('compose.numberedList')"
+        ></button>
+        <button type="button" class="ql-blockquote" [attr.aria-label]="t('compose.quote')"></button>
+        <button type="button" class="ql-code-block" [attr.aria-label]="t('compose.code')"></button>
+      </span>
+      <span class="ql-formats">
+        <button
+          type="button"
+          class="ql-align"
+          value=""
+          [attr.aria-label]="t('compose.alignLeft')"
+        ></button>
+        <button
+          type="button"
+          class="ql-align"
+          value="center"
+          [attr.aria-label]="t('compose.alignCenter')"
+        ></button>
+        <button
+          type="button"
+          class="ql-align"
+          value="right"
+          [attr.aria-label]="t('compose.alignRight')"
+        ></button>
+      </span>
+      <span class="ql-formats">
+        <button type="button" class="ql-link" [attr.aria-label]="t('compose.link')"></button>
+        <button
+          type="button"
+          class="ql-clean"
+          [attr.aria-label]="t('compose.clearFormatting')"
+        ></button>
+      </span>
+    </ng-template>
+  </p-editor>
 
   <div class="attachments">
     <div class="attachment-grid">
@@ -462,7 +334,9 @@
       <button type="button" class="discard" (click)="saveDraft()">
         {{ savingDraft() ? t('common.loading') : t('compose.saveDraft') }}
       </button>
-      <button type="button" class="discard" (click)="close()">{{ t('compose.discard') }}</button>
+      <button type="button" class="discard" (click)="discard()">
+        {{ discarding() ? t('common.loading') : t('compose.discard') }}
+      </button>
     </div>
     <button type="button" class="send" [disabled]="!canSend()" (click)="send()">
       {{ sending() ? t('common.loading') : t('compose.send') }}
