@@ -16,8 +16,7 @@ import { AttachmentService } from '../../core/api/attachment.service';
 import { MessageService } from '../../core/api/message.service';
 import type { DraftAttachment, Mailbox } from '../../shared/models';
 
-// Reply and Forward differ only in what they seed: a reply knows the recipient and threads
-// onto the original, a forward starts with an empty To and carries the text along.
+// They differ only in the seed: a reply knows the recipient and threads; a forward starts empty.
 export interface ComposeSeed {
   readonly to: string[];
   readonly cc?: string[];
@@ -26,13 +25,11 @@ export interface ComposeSeed {
   readonly body: string;
   // A draft reopens with the markup it was written with, not a flattened copy of it.
   readonly html?: string | null;
-  // Set when the composer was opened from a draft: saving or sending removes that draft
-  // instead of leaving a trail of half-written copies behind.
+  // Saving or sending removes the draft it was opened from, rather than leaving half-written copies.
   readonly replacesDraftId?: string;
 }
 
-// Mirrors MAIL_MAX_ATTACHMENT_BYTES. The server enforces it either way; this is only so the
-// bar can fill before a doomed upload leaves the browser.
+// Mirrors MAIL_MAX_ATTACHMENT_BYTES; the server enforces it either way, this only fills the bar first.
 const MAX_ATTACHMENT_BYTES = 26_214_400;
 
 @Component({
@@ -55,9 +52,8 @@ export class ComposePanel {
   readonly seed = input<ComposeSeed | null>(null);
   readonly closed = output<void>();
   readonly sent = output<void>();
-  // Distinct from `closed`: a saved draft is a new row in Drafts under a new id, and the
-  // list has to be refetched. Closing on its own left the old row on screen, and clicking
-  // it asked for a message that no longer exists.
+  // Distinct from `closed`: a saved draft lands under a new id, so the list must be refetched
+  // or the dead row stays on screen and asks for a message that no longer exists.
   readonly saved = output<void>();
 
   private readonly messages = inject(MessageService);
@@ -89,10 +85,8 @@ export class ComposePanel {
   private readonly replaces = signal<string | null>(null);
 
   constructor() {
-    // Runs once, when the panel opens: after that the fields belong to whoever is typing.
-    // It waits for the editor: the effect's first pass can land before the view exists, and
-    // marking the seed as applied there dropped the body on the floor - which is why a
-    // forward arrived with its subject and an empty message.
+    // Runs once on open; after that the fields belong to whoever is typing. It waits for the
+    // editor, whose absence on the first pass used to drop the body and open a forward empty.
     effect(() => {
       const context = this.seed();
       const editor = this.editor()?.nativeElement;

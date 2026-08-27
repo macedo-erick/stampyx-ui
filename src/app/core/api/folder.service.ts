@@ -5,8 +5,7 @@ import type { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type { Folder } from '../../shared/models';
 
-// Backed by IMAP rather than by the message rows, so a folder shows up the moment it is
-// created instead of only once something lands in it.
+// Backed by IMAP, not the message rows, so a folder shows up before anything lands in it.
 @Service()
 export class FolderService {
   private readonly http = inject(HttpClient);

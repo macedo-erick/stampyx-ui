@@ -1,6 +1,5 @@
-/* Anchored bottom-right so the message list stays usable while writing. Colours come from
-   the app tokens so it follows the theme; only the radii are local, because the panel is
-   the first screen to adopt the 14 / 8 / 999 scale. */
+/* Anchored bottom-right so the list stays usable while writing. Colours are app tokens; only
+   the radii are local, this being the first screen on the 14 / 8 / 999 scale. */
 :host {
   position: absolute;
   right: 26px;
@@ -220,8 +219,7 @@
   background: var(--stx-line);
 }
 
-/* The body is written here and read in someone else's client, so it gets the same shape a
-   mail client gives it rather than the page's own defaults. */
+/* Read in someone else's client, so it takes a mail client's shape, not the page's defaults. */
 .body ul,
 .body ol {
   margin: 6px 0;

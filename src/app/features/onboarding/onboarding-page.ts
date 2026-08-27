@@ -33,8 +33,7 @@ export class OnboardingPage {
       this.domainId.set(this.me.suggestedDomainId() ?? rows[0]?.id ?? null);
     });
 
-    // Someone who signed up as erick@stampyx.com already chose their address; the field
-    // arrives filled and checked instead of empty.
+    // Someone who signed up as erick@stampyx.com already chose the address; the field arrives filled.
     effect(() => {
       const suggested = this.me.suggestedLocalPart();
 

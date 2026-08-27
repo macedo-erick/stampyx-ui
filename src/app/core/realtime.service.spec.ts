@@ -55,9 +55,8 @@ describe('RealtimeService', () => {
     expect(seen).toEqual(['first']);
   });
 
-  // The panel re-subscribes on every navigation and the folder list re-reads on every
-  // change. While the last push was held in a signal, each of those read it as a fresh
-  // arrival, so changing route or folder announced mail that had already been seen.
+  // The panel re-subscribes on every navigation. While the last push sat in a signal, each of
+  // those read it as fresh, so changing route or folder announced mail already seen.
   it('does not replay a past arrival to a listener that came later', () => {
     const service = build();
 
