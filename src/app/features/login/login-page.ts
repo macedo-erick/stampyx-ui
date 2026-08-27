@@ -19,8 +19,7 @@ export class LoginPage {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  // Address first, password second, like the Keycloak screen. It also keeps the password
-  // field off the page until there is an address to attach it to.
+  // Address first, like the Keycloak screen, and no password field until there is one to attach it to.
   protected readonly step = signal<1 | 2>(1);
   private readonly focusTarget = viewChild<ElementRef<HTMLInputElement>>('focusTarget');
   protected readonly email = signal('');
@@ -29,8 +28,7 @@ export class LoginPage {
   protected readonly busy = signal(false);
   protected readonly failed = signal<string | null>(null);
 
-  // Unlike the Keycloak screen, this one serves mailboxes on customer domains too, so the
-  // address cannot be a local part with a fixed suffix.
+  // This one serves customer domains too, so the address cannot be a local part with a fixed suffix.
   protected readonly canContinue = computed(() => {
     const at = this.email().trim().lastIndexOf('@');
 
@@ -38,8 +36,7 @@ export class LoginPage {
   });
 
   constructor() {
-    // Moving focus to the field that just replaced the previous step, which `autofocus`
-    // cannot do on a step change and the lint rule rightly forbids anyway.
+    // `autofocus` cannot follow a step change, and the lint rule forbids it anyway.
     effect(() => {
       this.step();
       this.focusTarget()?.nativeElement.focus();
@@ -75,8 +72,7 @@ export class LoginPage {
       },
       error: () => {
         this.busy.set(false);
-        // One message for every failure: the API does not say whether the address exists,
-        // and neither should the panel.
+        // One message for every failure: the API does not say whether the address exists, nor should this.
         this.failed.set('login.failed');
       },
     });

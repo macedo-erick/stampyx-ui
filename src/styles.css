@@ -13,11 +13,8 @@
 @plugin 'tailwindcss-primeui';
 @custom-variant dark (&:where(.app-dark, .app-dark *));
 
-/*
- * The mockup palette is the brand; PrimeNG's Aura variables are the system. Rather than
- * out-specifying Aura, its own custom properties are redefined here, so every component
- * keeps computing hover, focus and disabled states from these values.
- */
+/* The mockup palette is the brand, Aura is the system. Redefining Aura's own custom properties
+   rather than out-specifying them keeps every component computing its states from these values. */
 :root {
   --stx-ink: #2d6f8a;
   --stx-ink-text: #215b76;
@@ -37,8 +34,7 @@
 
   --stx-line-strong: #c7c0ad;
 
-  /* Three steps, not one: cards, fields and pills. The single 3px value was what made the
-     panel read as square next to the sign-in screen. */
+  /* Three steps, not one: cards, fields and pills. A single 3px read as square next to sign-in. */
   --stx-radius: 14px;
   --stx-radius-sm: 8px;
   --stx-radius-pill: 999px;
@@ -72,8 +68,7 @@
   --p-primary-hover-color: var(--stx-ink-text);
   --p-content-background: var(--stx-surface);
   --p-content-border-color: var(--stx-line);
-  /* Most PrimeNG surfaces here are fields and menus, so they take the field radius; the
-     page's own cards use --stx-radius directly. */
+  /* Fields and menus take the field radius; the page's own cards use --stx-radius directly. */
   --p-content-border-radius: var(--stx-radius-sm);
   --p-border-radius-sm: var(--stx-radius-sm);
   --p-border-radius-md: var(--stx-radius-sm);
@@ -98,9 +93,8 @@ body {
   font-size: 14px;
 }
 
-/* The browser's own scrollbar is a wide light rail that ignores the theme, and it shows up
-   in the middle of every panel: the message list, the reading pane, the folder tree. Styled
-   once here so every scrolling area in the app looks the same. */
+/* The browser's own rail ignores the theme and shows up mid-panel everywhere, so it is styled
+   once here for every scrolling area. */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--stx-line-strong) transparent;
@@ -116,8 +110,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  /* The border is what insets the thumb: padding-box keeps the background off it, so the
-     bar reads as a narrow pill with room around it rather than a rail filling the gutter. */
+  /* The border insets the thumb and padding-box keeps the background off it, so it reads as a pill. */
   border: 3px solid transparent;
   border-radius: var(--stx-radius-pill);
   background: var(--stx-line-strong);
@@ -133,8 +126,7 @@ body {
   background: transparent;
 }
 
-/* Headless confirm dialog. PrimeNG still draws the panel it puts the template in, so it is
-   flattened here - otherwise the card inside sits in a second frame. */
+/* Headless confirm dialog: PrimeNG still draws its own panel, flattened here so the card is not framed twice. */
 /* Both classes, so it outranks .p-dialog no matter which stylesheet the theme lands in. */
 .p-dialog.p-confirmdialog {
   background: transparent;

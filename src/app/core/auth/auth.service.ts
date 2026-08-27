@@ -14,9 +14,8 @@ interface StampyxTokenClaims {
 
 export type SessionKind = 'account' | 'mailbox';
 
-// A facade over the two ways into the panel. People who registered themselves come through
-// Keycloak; mailbox users an administrator provisioned come through a stampyx token. Screens
-// read the same signals either way.
+// A facade over the two ways in: Keycloak for self-registered people, a stampyx token for
+// provisioned mailbox users. Screens read the same signals either way.
 @Service()
 export class AuthService {
   private readonly keycloak = inject(Keycloak);
@@ -63,8 +62,7 @@ export class AuthService {
       .join(''),
   );
 
-  // Only a Keycloak session has a self-service console; a mailbox user changes their password
-  // in stampyx, because that is the password Dovecot checks.
+  // Only Keycloak has a self-service console; a mailbox password is changed in stampyx, where Dovecot reads it.
   readonly canManageAccount = computed(() => this.kind() === 'account');
 
   token(): string | null {
