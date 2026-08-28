@@ -5,6 +5,11 @@ import type { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type { MessageDetail, MessageSummary, Page } from '../../shared/models';
 
+export interface BulkResult {
+  readonly processed: readonly string[];
+  readonly failed: readonly string[];
+}
+
 export interface SendMessageBody {
   to: string[];
   cc?: string[];
@@ -39,17 +44,14 @@ export class MessageService {
     return this.http.post<{ messageId: string }>(this.base(mailboxId), body);
   }
 
-  // Never reaches the MTA: composed and appended straight into Drafts.
   saveDraft(mailboxId: string, body: SendMessageBody): Observable<void> {
     return this.http.post<void>(`${this.base(mailboxId)}/drafts`, body);
   }
 
-  // The whole conversation oldest first, marked read on the way: one call, not a read plus a thread.
   thread(mailboxId: string, id: string): Observable<MessageDetail[]> {
     return this.http.get<MessageDetail[]>(`${this.base(mailboxId)}/${id}/thread`);
   }
 
-  // Through HttpClient, not a link: the endpoint needs a bearer token an <a href> cannot carry.
   attachment(mailboxId: string, id: string, index: number): Observable<Blob> {
     return this.http.get(
       `${this.base(mailboxId)}/${encodeURIComponent(id)}/attachments/${String(index)}`,
@@ -57,12 +59,16 @@ export class MessageService {
     );
   }
 
-  setRead(mailboxId: string, id: string, read: boolean): Observable<void> {
-    return this.http.put<void>(`${this.base(mailboxId)}/${id}/read`, { read });
+  bulkRead(mailboxId: string, ids: readonly string[], read: boolean): Observable<BulkResult> {
+    return this.http.put<BulkResult>(`${this.base(mailboxId)}/bulk/read`, { ids, read });
   }
 
-  move(mailboxId: string, id: string, folder: string): Observable<void> {
-    return this.http.put<void>(`${this.base(mailboxId)}/${id}/folder`, { folder });
+  bulkMove(mailboxId: string, ids: readonly string[], folder: string): Observable<BulkResult> {
+    return this.http.put<BulkResult>(`${this.base(mailboxId)}/bulk/folder`, { ids, folder });
+  }
+
+  bulkRemove(mailboxId: string, ids: readonly string[]): Observable<BulkResult> {
+    return this.http.post<BulkResult>(`${this.base(mailboxId)}/bulk/delete`, { ids });
   }
 
   remove(mailboxId: string, id: string): Observable<void> {

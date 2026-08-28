@@ -41,13 +41,10 @@ export class Sidebar {
     void this.router.navigate(['/inbox'], { queryParams: { compose: 1 } });
   }
 
-  // In the URL, not just memory: otherwise a reload lands in INBOX and no folder can be linked.
   protected openFolder(folder: Folder): void {
     void this.router.navigate(['/inbox'], { queryParams: { folder: folder.path } });
   }
 
-  // A badge means unread, not how much the folder holds. Drafts is the exception: a draft is
-  // never unread, so it counts what is still unfinished.
   protected badge(folder: Folder): number {
     return folder.specialUse === '\\Drafts' ? folder.total : folder.unread;
   }
@@ -75,7 +72,6 @@ export class Sidebar {
   }
 }
 
-// Dovecot's folders in reading order; alphabetical would bury Sent under a custom "Arquivo".
 const ORDER = ['inbox', 'sent', 'drafts', 'junk', 'spam', 'trash', 'archive'];
 
 function rank(folder: Folder): number {

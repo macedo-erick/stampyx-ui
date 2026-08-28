@@ -6,7 +6,6 @@ import { environment } from '../../../environments/environment';
 import type { Mailbox, Me, PlatformDomain } from '../../shared/models';
 import { AuthService } from '../auth/auth.service';
 
-// One call says which surface to draw: a platform address, a console for own domains, or both.
 @Service()
 export class MeService {
   private readonly http = inject(HttpClient);
@@ -23,7 +22,6 @@ export class MeService {
   readonly suggestedLocalPart = computed(() => this.me()?.suggestedLocalPart ?? null);
   readonly suggestedDomainId = computed(() => this.me()?.suggestedDomainId ?? null);
 
-  // Session-local: the account still has no address, it just stops being dragged back every time.
   private readonly dismissed = signal(false);
 
   readonly shouldPromptAddress = computed(() => this.needsAddress() && !this.dismissed());

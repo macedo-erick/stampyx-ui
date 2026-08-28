@@ -36,7 +36,6 @@ export class AdminService {
     return this.http.delete<void>(`${this.base}/mailboxes/${id}`);
   }
 
-  // The DKIM value exists only once the seed has generated the key pair on a deployed instance.
   platformDns(id: string): Observable<DnsRecord[]> {
     return this.http.get<DnsRecord[]>(`${this.base}/platform-domains/${id}/dns`);
   }

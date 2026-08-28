@@ -11,7 +11,6 @@ import { MobileNav } from './mobile-nav.service';
   imports: [TranslocoDirective, RouterLink],
   templateUrl: './top-bar.html',
   styleUrl: './top-bar.css',
-  // The brand precedes the field, so no sibling selector reaches it; the host carries it.
   host: { '[class.is-searching]': 'searchOpen()' },
 })
 export class TopBar {

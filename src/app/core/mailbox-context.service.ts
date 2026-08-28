@@ -6,7 +6,6 @@ import { FolderService } from './api/folder.service';
 import { MeService } from './api/me.service';
 import { RealtimeService } from './realtime.service';
 
-// The shell draws the folder list and the inbox reads from it, so the selection lives in neither.
 @Service()
 export class MailboxContext {
   private readonly me = inject(MeService);
@@ -14,8 +13,6 @@ export class MailboxContext {
   private readonly realtime = inject(RealtimeService);
 
   constructor() {
-    // Mail arriving is the only thing that moves a badge without the panel acting, so the only
-    // thing that must refetch. Reading, moving and deleting already reload on their way out.
     this.realtime.received$.pipe(takeUntilDestroyed()).subscribe(() => this.reloadFolders());
   }
 
@@ -31,7 +28,6 @@ export class MailboxContext {
       return picked;
     }
 
-    // The platform address first: it is the one a consumer actually reads.
     return (available.find((row) => row.platform) ?? available[0])?.id ?? null;
   });
 
@@ -47,6 +43,10 @@ export class MailboxContext {
 
   readonly draftsPath = computed(
     () => this.folders().find((row) => row.specialUse === '\\Drafts')?.path ?? null,
+  );
+
+  readonly trashPath = computed(
+    () => this.folders().find((row) => row.specialUse === '\\Trash')?.path ?? null,
   );
 
   readonly sentPath = computed(
@@ -75,7 +75,6 @@ export class MailboxContext {
 
     this.foldersApi.list(id).subscribe({
       next: (rows) => this.folders.set(rows),
-      // A mailbox whose domain is not verified yet has no IMAP account to list.
       error: () => this.folders.set([]),
     });
   }

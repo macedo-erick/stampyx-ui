@@ -23,7 +23,6 @@ describe('TranslatedTitleStrategy', () => {
     title = TestBed.inject(Title);
   });
 
-  // The route's title is a translation key; Angular's own tree walk is not what this class adds.
   function withRouteTitle(key: string | undefined) {
     vi.spyOn(strategy, 'buildTitle').mockReturnValue(key);
   }

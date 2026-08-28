@@ -85,7 +85,18 @@
     "noRecipients": "sem destinatário visível",
     "threadCount": "{{count}} mensagens nesta conversa",
     "threadCollapse": "Recolher mensagem",
-    "threadExpand": "Abrir mensagem"
+    "threadExpand": "Abrir mensagem",
+    "markRead": "Marcar como lida",
+    "open": "Abrir",
+    "selectAll": "Selecionar todas",
+    "clearSelection": "Limpar seleção",
+    "selectRow": "Selecionar mensagem de {{name}}",
+    "selectedCount": "{{count}} selecionadas",
+    "menuCount": "{{count}} mensagens",
+    "restore": "Restaurar",
+    "unarchive": "Desarquivar",
+    "deleteForever": "Excluir definitivamente",
+    "batchPartial": "{{count}} mensagens não puderam ser atualizadas"
   },
   "compose": {
     "title": "Nova mensagem",

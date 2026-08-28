@@ -34,7 +34,6 @@ export class FoldersPage {
     this.context.folders().filter((row) => !row.system),
   );
 
-  // One level only: more than the sidebar can show without becoming a tree widget.
   protected readonly parentOptions = computed(() =>
     this.ownFolders().filter((row) => row.parent === null),
   );
@@ -57,7 +56,6 @@ export class FoldersPage {
         this.context.reloadFolders();
         this.toast.add({ severity: 'success', summary: created.path });
       },
-      // The message the server sends is already surfaced by the error interceptor.
       error: () => this.saving.set(false),
     });
   }
@@ -104,7 +102,6 @@ export class FoldersPage {
       acceptButtonStyleClass: 'stx-pill--danger',
       accept: () => {
         this.api.remove(mailboxId, folder.path).subscribe({
-          // The server refuses when a rule files into it, and its message names how many.
           next: () => this.context.reloadFolders(),
           error: () => undefined,
         });

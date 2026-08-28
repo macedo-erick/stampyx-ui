@@ -38,7 +38,6 @@ export class RulesPage {
 
   protected readonly folderOptions = computed(() => this.context.folders());
 
-  // Debounced: the condition changes on every keystroke and each preview is a query.
   private readonly previewKey = computed(() => {
     const draft = this.draft();
 
@@ -126,7 +125,6 @@ export class RulesPage {
   }
 
   protected setAction(action: RuleAction): void {
-    // Only move_to carries a folder; leaving a stale one would fail the server's check.
     this.patch({ action, ...(action === 'move_to' ? {} : { targetFolder: null }) });
   }
 
@@ -186,7 +184,6 @@ export class RulesPage {
     });
   }
 
-  // The API insists on a full permutation, so the whole list is sent every time.
   protected move(rule: FolderRule, delta: number): void {
     const id = this.mailboxId();
     const ordered = [...this.items()];
